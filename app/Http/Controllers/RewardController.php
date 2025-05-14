@@ -17,18 +17,18 @@ class RewardController extends Controller
     }
     public function showAcc($id)
     {
-        $data = event::where('id',$id)->first();
+        $data = event::where('id', $id)->first();
         $reward = Reward::where('event_id', $id)->get();
-        return view('page/partner', ['partnerList' => $reward,'event'=>$data]);
+        return view('page/partner', ['partnerList' => $reward, 'event' => $data]);
     }
     public function reward($id)
     {
         $volunteer = EventRegistModel::where('event_id', $id)->get();
-        foreach($volunteer as $v){
+        foreach ($volunteer as $v) {
             $v->reward = 'true';
             $v->save();
         }
-        return redirect ('/volunteer/showAccepted/'.$id);
+        return redirect('/volunteer/showAccepted/' . $id);
     }
     public function download()
     {

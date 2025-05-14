@@ -4,24 +4,27 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Sponsorship;
+use Illuminate\Support\Facades\Validator;
 
 class SponsorshipController extends Controller
 {
     public function addsponsorship(Request $request)
-    {
-        // dd($request->all());
-
-        // Validate the incoming request
-        $validate = $request->validate([
+    {    
+        
+        $validate = Validator::make($request->all(), [
             'account_id' => 'required',
             'event_id' => 'required',
             'nama_sponsor' => 'required',
-            'contact' => 'required',
+            'contact' => ['required', 'regex:/^\d{10,13}$/'],
             'image' => 'required|image'
-        ]);
-        // dd('test');
+    ]);
 
-        // Store the uploaded file and get the filename
+    if ($validate->fails()) {
+        return redirect()->back()
+            ->withErrors($validate, 'sponsorship')
+            ->withInput();
+    }
+        
         $filename = $request->file('image')->store('public/sponsor');
 
         // Create a new Sponsorship instance and save it to the database
