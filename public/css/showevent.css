@@ -1,3 +1,8 @@
+html, body {
+    background-color: #E8D8C4 !important;
+}
+
+
 /* General Reset and Base Styles */
 * {
     /* background-color:cornsilk; */
@@ -38,7 +43,7 @@
     transform: translateX(-50%);
     width: 50px;
     height: 4px;
-    background-color: darkslategray; /* Decorative underline */
+    background-color: #2f4f4f; /* Decorative underline */
     border-radius: 2px;
 }
 
@@ -60,6 +65,38 @@
     padding: 10px 20px;
 }
 
+.sponsor {
+    background-color: #2f4f4f !important;
+    color: #fff !important;
+    padding: 10px 20px;
+    font-size: 19px;
+    border: none !important;
+    border-radius: 25px;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+}
+
+.sponsor:hover {
+    background-color: #244040 !important; /* Hover sponsor */
+}
+
+.sponsor2 {
+    background-color: #2f4f4f !important;
+    color: #fff !important;
+    padding: 10px 20px;
+    font-size: 19px;
+    border: none !important;
+    border-radius: 25px;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+}
+
+.sponsor2:hover {
+    background-color: #1e6b6b !important; /* Hover sponsor2 beda warna */
+}
+
+
+
 /* Show Section */
 .show {
     display: flex;
@@ -75,11 +112,14 @@
 }
 
 .show-image img {
-    max-width: 100%;
-    height: auto;
+    width: 100%;           /* Biar responsif mengikuti parent */
+    height: 300px;         /* Tetapkan tinggi tetap */
+    object-fit: cover;     /* Pangkas gambar agar tidak gepeng */
     display: block;
     transition: transform 0.5s ease;
+    border-radius: 10px;   /* Optional: buat gambar sudutnya lembut */
 }
+
 
 .show-image:hover img {
     transform: scale(1.2);
@@ -100,6 +140,11 @@
     line-height: 1.5;
     color: #666;
 }
+
+.bg-custom-blue {
+    background-color: #2f4f4f !important;
+}
+
 
 /* Read More Button */
 .show-content .read-more {

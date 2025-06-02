@@ -15,9 +15,9 @@
     <div class="wrapper">
         <div class="nav">
             <div class="logo">
-                <a href="/">
-                    <br>
-                    <p>Collabora</p>
+                <a>
+                    <img src="img/logo.png" alt="Collabora Logo" style="height: 40px;" class="logo-img">
+                    <p lass="logo-text" >Collabora</p>
                 </a>
             </div>
         </div>
@@ -27,6 +27,7 @@
         </div>
 
         <div class="content-header">
+            <br>
             <p>Platform digital yang menghubungkan relawan dengan berbagai
                 kesempatan untuk membantu komunitas, lingkungan, atau kegiatan 
                 sosial lainnya.
@@ -39,7 +40,7 @@
         </div>
 
         <div class="col-img">
-            <img src="img/potret2.png" alt="" srcset="">
+            <img src="img/potret2.jpg" alt="" srcset="">
         </div>
     </div>
 </body>

@@ -1,4 +1,5 @@
-<footer class="footer">
+
+    <footer class="footer">
     <div class="container">
         <div class="row">
             <div class="col-md-4">
@@ -13,14 +14,7 @@
                     <li>Email: collabora@telkomuniversity.ac.id</li>
                 </ul>
             </div>
-            <div class="col-md-4">
-                <h5>Follow Us</h5>
-                <!-- <ul class="social-icons">
-                    <li><a href="#"><i class="fab fa-facebook"></i></a></li>
-                    <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-                    <li><a href="#"><i class="fab fa-instagram"></i></a></li>
-                </ul> -->
-            </div>
         </div>
     </div>
 </footer>
+

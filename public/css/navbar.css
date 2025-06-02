@@ -34,7 +34,7 @@
 }
 
 .nav-link{
-    color:darkslategrey;
+    color:#2f4f4f;
     font-weight: 500;
     position: relative;
     padding-bottom: 5px;
@@ -61,5 +61,11 @@
     .nav-link:hover::before, .nav-link.active::before{
         width: 100%;
         visibility: visible;
+    }
+
+   .navbar-brand img {
+    height: 40px;
+    width: auto;
+    margin-right: 10px;
     }
 }

@@ -7,16 +7,13 @@
     <title>Event Details</title>
 
     <!-- Link to CSS -->
-    <link rel="stylesheet" href="{{ asset('css/showevent.css') }}">
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
-    <!-- Link Boostrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    @stack('css')
+    <link rel="stylesheet" href="{{ asset('css/showevent.css') }}">
+
     <!-- Link  JQuery-->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
@@ -81,9 +78,7 @@
     <div class="container ">
         <section class="show">
             <div class="show-image">
-                {{-- <img src="{{ asset('img/potret3.jpg') }}" alt="Event Image"> --}}
                 <img src="{{ asset('storage/' . $eventList->event_image) }}" alt="Event Image">
-
             </div>
             <div class="show-content">
                 <h2>📍{{ $eventList->location }}</h2>
@@ -106,8 +101,8 @@
                 <button type="button" class="sponsor" data-bs-toggle="modal" data-bs-target="#exampleModal">
                     Sponsorship
                 </button>
-                <button type="button" class="rating" data-bs-toggle="modal" data-bs-target="#create-rating">
-                    Give Ratings!
+                <button type="button" class="sponsor2" data-bs-toggle="modal" data-bs-target="#create-rating">
+                    Give Ratings
                 </button>
                 <a href="/dashboard" class="read-more">Back to Dashboard</a>
             </div>
@@ -140,7 +135,7 @@
         <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
-                    <div class="modal-header bg-black text-white">
+                  <div class="modal-header bg-custom-blue text-white">
                         <h5 class="modal-title" id="exampleModalLabel"><b>Form Sponsorship</b></h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
@@ -201,7 +196,7 @@
             aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
-                    <div class="modal-header bg-black text-white">
+                    <div class="modal-header bg-custom-blue text-white">
                         <h5 class="modal-title" id="exampleModalLabel"><b>Form Rating</b></h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"
                             aria-label="Close"></button>

@@ -1,5 +1,11 @@
 @extends('layouts.main')
 @section('content')
+<br>
+<br>
+<br>
+<div class="d-flex align-items-center">
+  <h1 class="mb-0">Manage Accepted Volunteers</h1>
+    </div>
     <div class="mt-5 border p-2 rounded-1 bg-light">
         {{-- @php
         dd($volunteerList);

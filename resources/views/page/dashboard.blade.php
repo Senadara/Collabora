@@ -29,15 +29,9 @@
                 <section class="container">
                     <div class="slide-wrapper">
                         <div class="slider">
-                            <img id="slide-1" src="img/1.png" alt="" class="card-img">
-                            <img id="slide-2" src="img/2.png" alt="" class="card-img">
-                            <img id="slide-3" src="img/3.png" alt="" class="card-img">
+                            <img id="slide-3" src="img/baru1.png" alt="" class="card-img">
                         </div>
-                        <div class="slider-nav">
-                            <a href="#slide-1"></a>
-                            <a href="#slide-2"></a>
-                            <a href="#slide-3"></a>
-                        </div>
+
                     </div>
                 </section>
                 <!-- End Slider -->
@@ -66,7 +60,6 @@
 
                             <div class="image-content">
                                 <span class="overlay"> </span>
-
                                 <div class="card-image">
                                     <img src="/storage/{{$event->event_image}}" alt="" class="card-img">
                                 </div>

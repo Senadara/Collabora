@@ -9,9 +9,9 @@ html,body {
     height: 100%;
 }
 
-.mburi{
+.mburi {
     background-color: #E8D8C4;
-    height: 500%;
+    min-height: 100vh; /* cukup setinggi layar jika kontennya sedikit */
 }
 
 .ktk{
@@ -147,6 +147,24 @@ img {
 
 /* ---------------------------------------- */
 /* Foooterrrrr */
+
+.social-icons {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: 15px;
+}
+
+.social-icons li a {
+    color: #2f4f4f;
+    font-size: 24px;
+    transition: color 0.3s ease;
+}
+
+.social-icons li a:hover {
+    color: #244040;
+}
+
 .footer {
     background-color: #333; /* Warna latar belakang footer */
     color: #fff; /* Warna teks footer */
@@ -169,6 +187,7 @@ img {
 
 .footer ul li {
     margin-bottom: 10px; /* Jarak antar item list */
+    color: #beb3b3; /* Warna teks footer */
 }
 
 .social-icons {
@@ -198,7 +217,7 @@ img {
 /* Landing Page */
 
 body.blanding {
-    background-image: url('img/potret1.png');
+    background-image: url('img/potret2.jpg');
     background-repeat: no-repeat;
     background-size: cover; /* Ensures the background image covers the entire body */
     background-position: center; /* Centers the background image */
@@ -207,7 +226,7 @@ body.blanding {
     height: 100vh; /* Ensures the body takes up the full viewport height */
     width: 100%;
     margin-bottom: 10;
-    background: rgba(0, 0, 0, 0.8); /* Slight background for readability */
+    background: #222831
 }
 
 .wrapper {
@@ -294,8 +313,8 @@ body.blanding {
     border-radius: 10px 10px 10px 10px;
     border: none;
     cursor: pointer;
-    color: white;
-    background-color:#222831;
+    color: rgb(5, 10, 38);
+    background-color:#e5e4c6;
     box-shadow: 0px 21px 53px rgba(20, 13, 40, 0.66);
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 }
@@ -324,6 +343,26 @@ body.blanding {
     display: flex;
     justify-content: flex-end;
 }
+/* --------------------------------------------------- */
+
+/* Logo */
+.logo a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.logo-img {
+    height: 40px; /* atur sesuai ukuran logo */
+    margin-right: 10px; /* kasih jarak antara logo & teks */
+}
+
+.logo-text {
+    font-size: 1.5rem; /* atur ukuran teks */
+    color: white; /* sesuaikan warna teks */
+    margin: 0; /* hilangkan margin bawaan */
+}
+/* --------------------------------------------------------- */
 
 
 

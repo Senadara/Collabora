@@ -35,12 +35,7 @@
             <p>Don't have an account? <a 
             href="/account/create">Create Account</a></p>
         </div>
-
-        
-
-        
          </form>
-
         @foreach ($errors->all() as $error)
             <li>{{ $error }}</li>
         @endforeach

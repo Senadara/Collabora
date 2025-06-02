@@ -5,11 +5,11 @@
     <br>
     <br>
     <br>
-    <div class="d-flex mb-4">
-        <div class="d-flex ms-auto">
-            <a href="event/create" class="btn btn-dark">Create Data</a>
-        </div>
-    </div>
+   <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Manage Event</h1>
+    <a href="event/create" class="btn btn-dark">Create Data</a>
+</div>
+
 <div class="bg-light rounded px-3 py-2">
     <table id="eventTable" class="table bg-light border px-3 evt">
         <thead>
@@ -34,16 +34,15 @@
                     <td>{{ $item->location }}</td>
                     <td>{{ $item->date }}</td>
                     <td>{{ $item->description_event }}</td>
-                    <td>
-                        <a class="btn btn-outline-secondary" href="/event/show/{{ $item->id }}">Show</a>
-                        <a class="btn btn-outline-warning" href="/event/edit/{{ $item->id }}">Edit</a>
-                        <a class="btn btn-outline-primary" href="/sponsorship/{{$item->id}}">Request</a>
-                        <a class="btn btn-outline-dark"
-                            href="{{ route('show.volunteer', ['event' => $item->id]) }}">Volunteer</a>
-                        <a class="btn btn-outline-success"
-                            href="{{ route('show.accepted.volunteer', ['event' => $item->id]) }}">Member</a>
-                        <button class="ml-5 btn btn-outline-danger delete-btn"
-                            data-id="{{ $item->id }}">Delete</button>
+                  <td>
+                        <div class="d-flex flex-wrap gap-1">
+                            <a class="btn btn-outline-secondary" href="/event/show/{{ $item->id }}">Show</a>
+                            <a class="btn btn-outline-secondary" href="/event/edit/{{ $item->id }}">Edit</a>
+                            <a class="btn btn-outline-secondary" href="/sponsorship/{{ $item->id }}">Request</a>
+                            <a class="btn btn-outline-secondary" href="{{ route('show.volunteer', ['event' => $item->id]) }}">Volunteer</a>
+                            <a class="btn btn-outline-secondary" href="{{ route('show.accepted.volunteer', ['event' => $item->id]) }}">Member</a>
+                            <button class="btn btn-outline-danger delete-btn" data-id="{{ $item->id }}">Delete</button>
+                        </div>
                     </td>
                 </tr>
             @endforeach

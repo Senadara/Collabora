@@ -1,5 +1,11 @@
 @extends('layouts.main')
 @section('content')
+<br>
+<br>
+<br>
+<div class="d-flex align-items-center">
+  <h1 class="mb-0">Manage Sponsor List</h1>
+    </div>
     <div class=" mt-5 border p-2 rounded-1 bg-light border">
         <div class="d-flex justify-content-center">
             <a class="btn btn-outline-dark" href="/partner">sponsor</a>

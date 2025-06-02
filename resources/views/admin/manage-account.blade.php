@@ -3,8 +3,9 @@
     <br>
     <br>
     <br>
-    <div class="d-flex ms-auto">
-        <a href="{{ route('account.create') }}" class="btn btn-dark">Create Account</a>
+    <div class="d-flex align-items-center">
+        <h1 class="mb-0">Manage Account</h1>
+        <a href="{{ route('account.create') }}" class="btn btn-dark ms-auto">Create Account</a>
     </div>
     <br>
     <table class="table table-light table-hover">

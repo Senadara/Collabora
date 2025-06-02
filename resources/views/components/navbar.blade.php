@@ -13,7 +13,10 @@
 <!-- Start Navbar -->
 <nav class="navbar navbar-expand-lg fixed-top">
     <div class="container">
-        <a class="navbar-brand me-auto" href="/dashboard"><b>Collabora</b></a>
+       <a class="navbar-brand me-auto d-flex align-items-center" href="/dashboard">
+            <img src="/img/logo2.png" alt="Logo">
+            <b>Collabora</b>
+        </a>
         <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
             <div class="offcanvas-header">
                 <h5 class="offcanvas-title" id="offcanvasNavbarLabel"><b>Collabora</b></h5>
