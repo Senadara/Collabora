@@ -70,29 +70,6 @@ body{
 
 /* End Slider */
 
-/* footer */
-html, body {
-    height: 100%;
-    margin: 0;
-}
-
-.mburi {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-}
-
-.container.py-5 {
-    flex: 1;
-}
-
-.footer {
-    background-color: #f8f9fa;
-    padding: 20px 0;
-    text-align: center;
-}
-
-/* end footer */
 
 /* Judul */
 .judul2{
