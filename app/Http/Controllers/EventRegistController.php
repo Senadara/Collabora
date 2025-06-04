@@ -11,25 +11,26 @@ use Illuminate\Http\Request;
 class EventRegistController extends Controller
 {
     public function addeventregist(Request $request , $event)
-    {
-        //dd($event);
-        $this->validate($request, [
-            'phone' => 'required',
-            'experience' => 'required'
-            
-        ]);
+{
+    $this->validate($request, [
+        'phone' => 'required',
+        'experience' => 'required'
+    ]);
 
-        EventRegistModel::create([
-            'account_id' => session('account')->id,
-            'phone' => $request->phone,
-            'status' => 'request',  
-            'reward' => 'false',  
-            'experience' => $request->experience,
-            'event_id' => $event
-        ]);
+    EventRegistModel::create([
+        'account_id' => session('account')->id,
+        'phone' => $request->phone,
+        'status' => 'request',
+        'reward' => 'false',
+        'experience' => $request->experience,
+        'event_id' => $event
+    ]);
+    return response()->json([
+        'status' => 'success',
+        'message' => 'You have successfully registered for the event.'
+    ]);
+}
 
-        return redirect('/dashboard')->with('status', 'Data Berhasil Ditambahkan!');
-    }
     public function index()
     {
         $volunteer = EventRegistModel::with('event')->where('account_id', session('account')->id)->get();

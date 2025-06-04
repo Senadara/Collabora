@@ -84,8 +84,8 @@
             </div>
 
             <div class="d-flex justify-content-center gap-2">
-                <button class="btn btn-success" type="submit">Create</button>
                 <a href="/event"><button type="button" class="btn btn-danger">Cancel</button></a>
+                <button class="btn btn-success" type="submit">Create</button>
             </div>
         </form>
     </div>

@@ -52,7 +52,7 @@
                                 @csrf
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title">Registration Form</h5>
+                                        <h5 class="modal-title">Registation Form</h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
@@ -79,7 +79,8 @@
     </div>
 @endsection
 
-@push('scripts')
+   @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     document.querySelectorAll('form[name="formEventRegist"]').forEach(form => {
         form.addEventListener('submit', function (event) {
@@ -87,6 +88,9 @@
 
             fetch(form.action, {
                 method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': form.querySelector('input[name="_token"]').value
+                },
                 body: new FormData(form),
             })
             .then(response => {
@@ -96,7 +100,7 @@
             .then(data => {
                 Swal.fire({
                     title: 'Success!',
-                    text: 'You have successfully registered for the event.',
+                    text: data.message || 'You have successfully registered for the event.',
                     icon: 'success',
                     confirmButtonText: 'OK'
                 }).then(() => window.location.href = "/dashboard");
@@ -104,7 +108,7 @@
             .catch(error => {
                 Swal.fire({
                     title: 'Error!',
-                    text: 'Failed to register for the event.',
+                    text: error.message || 'Failed to register for the event.',
                     icon: 'error',
                     confirmButtonText: 'OK'
                 });
@@ -113,3 +117,4 @@
     });
 </script>
 @endpush
+

@@ -11,7 +11,7 @@
 </div>
 
 <div class="bg-light rounded px-3 py-2">
-    <table id="eventTable" class="table bg-light border px-3 evt">
+    <table id="eventTable" class="table bg-light border px-3 evt" >
         <thead>
             <tr>
                 <th scope="col">No</th>
