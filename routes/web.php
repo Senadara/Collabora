@@ -11,6 +11,8 @@ use App\Http\Controllers\{
     RatingController,
     RewardController
 };
+use App\Models\Event;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -21,7 +23,11 @@ use App\Http\Controllers\{
 */
 
 // Landing & Dashboard
-Route::get('/', fn () => view('welcome'));
+Route::get('/', function () {
+    $latestEvents = \App\Models\Event::orderBy('created_at', 'desc')->take(3)->get();
+    return view('welcome', ['latestEvents' => $latestEvents]);
+});
+
 Route::get('/dashboard', function () {
     $accounts = App\Models\Account::all();
     $events = App\Models\Event::all();

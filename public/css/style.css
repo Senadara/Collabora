@@ -150,6 +150,14 @@ img {
     outline: none; /* Menghilangkan outline saat tombol mendapatkan fokus */
 }
 
+.button-group {
+    display: flex;
+    gap: 16px; /* Jarak antar tombol */
+    justify-content: center;
+    margin-top: 20px;
+}
+
+
 
 /* ---------------------------------------- */
 /* Foooterrrrr */
@@ -259,6 +267,8 @@ body.blanding {
 }
 
 .wrapper {
+     background-color: #E8D8C4;
+    min-height: 100vh;  /* ganti dengan warna yang kamu mau */
     width: 100%;
     height: 100%;
 }
@@ -276,7 +286,7 @@ body.blanding {
     font-weight: bold;
     color: #333;
     margin: 0;
-    color: white;
+    color: rgb(30, 29, 33);
 }
 
 .nav ul {
@@ -311,14 +321,14 @@ body.blanding {
 }
 
 .header h1{
-    color: #fff;
+    color: #232d37;
     text-align: left;
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     font-size: 50px;
 }
 
 .header span{
-    color: #C7B7A3;
+    color: #232d37;
 }
 
 .content-header{
@@ -330,29 +340,35 @@ body.blanding {
 }
 
 .content-header p {
-    color: #fff;
+    color: #1a1a20;
     font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-size: 16px;
     text-align: center;
 }
 
-.login-btn{
-    width: 150px;
-    height: 42px;
-    border-radius: 10px 10px 10px 10px;
+.login-btn,
+.event-btn {
+    width: 200px; /* Panjang tombol disamakan */
+    padding: 12px 24px;
+    background-color: #d2c99e;
+    color: #0d162c;
     border: none;
+    border-radius: 8px; /* Sedikit rounded */
+    font-size: 16px;
+    font-weight: 500;
+    margin: 10px;
     cursor: pointer;
-    color: rgb(5, 10, 38);
-    background-color:#e5e4c6;
-    box-shadow: 0px 21px 53px rgba(20, 13, 40, 0.66);
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
 }
 
-.login-btn:hover{
-    transition: all .5s ease;
-    background-color: #C7B7A3;
-    box-shadow: 0px 21px 53px rgba(20, 13, 40, 0.66);
+.login-btn:hover,
+.event-btn:hover {
+    background-color: #b6b391;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
 }
+
 
 .col-img {
     position: absolute;
@@ -388,10 +404,269 @@ body.blanding {
 
 .logo-text {
     font-size: 1.5rem; /* atur ukuran teks */
-    color: white; /* sesuaikan warna teks */
+    color: rgb(41, 40, 57); /* sesuaikan warna teks */
     margin: 0; /* hilangkan margin bawaan */
 }
 /* --------------------------------------------------------- */
+
+/* abouts us */
+.dashboard-cards {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 40px 20px;
+    margin-top: 20px;
+}
+
+.dashboard-cards h1 {
+    font-size: 36px;
+    color: #232224;
+    margin-bottom: 20px;
+    text-align: center; /* opsional biar di tengah */
+}
+
+/* Bungkus kartu-kartu dengan flexbox */
+.cards-wrapper {
+    display: flex;
+    gap: 20px;
+    justify-content: center; /* tengahin kartu */
+    flex-wrap: wrap; /* supaya responsive */
+}
+
+
+.card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    width: 280px;
+    text-align: center;
+    transition: transform 0.3s ease;
+    flex: 1 1 280px;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+}
+
+.card-icon {
+    font-size: 36px;
+    color: #232224;
+    margin-bottom: 10px;
+}
+
+.card h3 {
+    margin: 10px 0 5px;
+    font-size: 20px;
+    color: #333;
+}
+
+.card p {
+    font-size: 14px;
+    color: #666;
+}
+/* --------------------------------- */
+
+/* card event */
+.card-event {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 40px;
+  padding: 0 20px; /* kasih padding kiri kanan */
+  box-sizing: border-box; /* supaya padding gak nambahin lebar */
+}
+
+
+.card-event .card {
+    width: 200px; /* lebih kecil dari sebelumnya */
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+}
+
+
+.card-event .card img {
+    width: 100%;
+    height: 160px; /* kecilkan dari 180px */
+    object-fit: cover;
+}
+
+
+.card-event .card-body {
+    padding: 15px;
+}
+
+.card-event .btn-custom-view {
+    display: inline-block;
+    margin-top: 10px;
+    background-color: #d2c99e;
+    color: rgb(13, 22, 44);
+    padding: 8px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+}
+/* ------------------------------ */
+
+h1 {
+  font-size: 36px;
+  color: #232224;
+  margin-bottom: 25px;
+  font-weight: 700;
+  width: fit-content;    /* Supaya lebarnya pas isi */
+  margin: 0 auto 25px auto; /* Top 0, right & left auto (center), bottom 25px */
+  padding-bottom: 8px;
+  text-align: center;
+  display: block;
+}
+
+
+h1::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0;
+  height: 4px;
+  background-color: #d2c99e;
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+
+h1:hover::after {
+  width: 100%;
+}
+
+/* ----------------------------------- */
+
+
+.footer-simple {
+    background-color: #232224;
+    color: #d2c99e;
+    text-align: center;
+    padding: 10px 0;
+    font-size: 14px;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}
+/* ------------------------------- */
+/* Untuk register-card juga kasih margin dan padding supaya gak nempel */
+.login-redirect {
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.register-card {
+  display: flex;
+  background-color: #f9f6ee;
+  padding: 25px 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  max-width: 10000px;
+  width: 100%;
+  align-items: center;
+  gap: 20px;
+}
+
+.card-image img {
+  width: 100%;
+  max-width: 600px; /* maksimal lebarnya */
+  height: auto;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;  /* vertikal tengah */
+  align-items: center;      /* horizontal tengah */
+  text-align: center;       /* text rata tengah */
+  padding: 20px;            /* biar gak mepet */
+}
+
+.card-content h3 {
+  color: #232224;
+  margin-bottom: 15px;
+  font-size: 28px;         /* diperbesar */
+  font-weight: 700;
+}
+
+.card-content p {
+  font-size: 18px;         /* sedikit diperbesar */
+  color: #555;
+  margin-bottom: 25px;
+  max-width: 400px;        /* supaya paragraf gak terlalu panjang */
+}
+
+.card-content button {
+  background-color: #d2c99e;
+  border: none;
+  color: #0d162c;
+  padding: 14px 40px;      /* agak besar juga */
+  font-size: 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: background-color 0.3s ease;
+}
+
+.card-content button:hover {
+  background-color: #b5ae80;
+}
+
+/* Responsive for smaller screens */
+@media (max-width: 480px) {
+  .register-card {
+    flex-direction: column;
+    text-align: center;
+  }
+  .card-image img {
+    width: 100px;
+    margin-bottom: 15px;
+  }
+  .card-content button {
+    width: 100%;
+  }
+}
+
+.animated-separator {
+  border: none;
+  height: 4px;
+  width: 80%;
+  margin: 40px auto;
+  background: linear-gradient(270deg, #d2c99e, #c6c9b5, #d2c99e);
+  background-size: 600% 600%;
+  border-radius: 10px;
+  animation: gradientShift 8s ease infinite;
+}
+
+/* Animasi gradient geser */
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+/* ----------------------------------------- */
+
+
+
 
 
 
