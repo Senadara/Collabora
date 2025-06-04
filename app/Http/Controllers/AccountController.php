@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Models\User;
 
 class AccountController extends Controller
 {
@@ -22,7 +23,8 @@ class AccountController extends Controller
     }
 
     // Menampilkan semua data account
-    function manage(){
+    function manage()
+    {
         $account = Account::all();
         return view('/admin/manage-account', ['accountList' => $account]);
     }
@@ -44,30 +46,6 @@ class AccountController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    // Fungsional Register
-
-    // public function store(Request $request)
-    // {
-    //     $request->validate([
-    //         'name' => 'required',
-    //         'email' => 'required|email|unique:accounts',
-    //         'password' => 'required|confirmed|min:6' // `confirmed` checks if `password_confirmation` matches
-    //     ]);
-
-    //     // Hash password before saving
-    //     $password = bcrypt($request->password);
-
-    //     // Insert into database
-    //     DB::table('accounts')->insert([
-    //         'name' => $request->name,
-    //         'email' => $request->email,
-    //         'role' => 'user',
-    //         'password' => $password
-    //     ]);
-
-    //     // return redirect('/account')->with('success', 'Akun berhasil dibuat!');
-    //     return response()->json(['message' => 'You Have Created Your Account!']);
-    // }
 
     public function store(Request $request)
     {
@@ -82,10 +60,6 @@ class AccountController extends Controller
         ]);
 
         if ($validator->fails()) {
-            // return response()->json([
-            //     'errors' => $validator->errors()
-            // ], 422);
-            // 422 = Unprocessable Entity
             return response()->json(['error' => 'Email has already been used']);
         }
 
@@ -168,15 +142,63 @@ class AccountController extends Controller
 
     public function destroy(Account $account)
     {
-    $account->delete();
-    return redirect()->route('manage')->with('success', 'Account has been deleted successfully');
+        $account->delete();
+        return redirect()->route('manage')->with('success', 'Account has been deleted successfully');
     }
 
 
 
     // Menampilkan form forgot password
-    public function forgot(){
+    public function forgot()
+    {
         return view('page.forgot-pass');
     }
 
+    public function createBiodata(Request $request)
+    {
+        $validated = $request->validate([
+            'account_id' => 'required|exists:accounts,id',
+            'full_name' => 'required|string',
+            'gender' => 'nullable|string',
+            'birth_date' => 'nullable|date',
+            'phone_number' => 'nullable|string',
+            'address' => 'nullable|string',
+            'university' => 'nullable|string',
+            'major' => 'nullable|string',
+            'semester' => 'nullable|string',
+            'instagram_handle' => 'nullable|string',
+        ]);
+
+        $existing = User::where('account_id', $validated['account_id'])->first();
+        if ($existing) {
+            return response()->json(['error' => 'Biodata already exists for this account.'], 409);
+        }
+
+        User::create($validated);
+        return response()->json(['message' => 'Biodata created successfully.']);
+    }
+
+    public function updateBiodata(Request $request, $account_id)
+    {
+        $user = User::where('account_id', $account_id)->first();
+
+        if (!$user) {
+            return response()->json(['error' => 'Biodata not found.'], 404);
+        }
+
+        $validated = $request->validate([
+            'full_name' => 'required|string',
+            'gender' => 'nullable|string',
+            'birth_date' => 'nullable|date',
+            'phone_number' => 'nullable|string',
+            'address' => 'nullable|string',
+            'university' => 'nullable|string',
+            'major' => 'nullable|string',
+            'semester' => 'nullable|string',
+            'instagram_handle' => 'nullable|string',
+        ]);
+
+        $user->update($validated);
+        return response()->json(['message' => 'Biodata updated successfully.']);
+    }
 }

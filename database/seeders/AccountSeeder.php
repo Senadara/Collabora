@@ -17,10 +17,11 @@ class AccountSeeder extends Seeder
     public function run()
     {
         //
-        DB::table('account')->insert([
+        DB::table('accounts')->insert([
             'name' => 'Admin',
             'email' => 'koh@gmail.com',
-            'password' => Hash::make('321')
+            'password' => Hash::make('321'),
+            'role' => 'admin'
         ]);
     }
 }
