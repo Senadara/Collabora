@@ -66,6 +66,9 @@ Route::get('/partner', [SponsorshipController::class, 'partner']);
 // -------------------- ACCOUNT --------------------
 Route::resource('/account', AccountController::class);
 Route::get('/admin/manage-account', [AccountController::class, 'manage'])->name('manage');
+Route::post('/biodata/create', [AccountController::class, 'createBiodata']);
+Route::put('/biodata/update/{account_id}', [AccountController::class, 'updateBiodata']);
+
 //Route::get('/admin/manage-account/{account}', [AccountController::class, 'destroy'])->name('account.destroy');
 
 // -------------------- REWARD --------------------

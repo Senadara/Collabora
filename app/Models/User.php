@@ -13,12 +13,22 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
-    protected $guarded = ['id'];
-    protected $table = 'users';
-    
+    protected $fillable = [
+        'account_id',
+        'full_name',
+        'gender',
+        'birth_date',
+        'phone_number',
+        'address',
+        'university',
+        'major',
+        'semester',
+        'instagram_handle',
+    ];
+
+
+    public function account()
+    {
+        return $this->belongsTo(Account::class);
+    }
 }

@@ -30,6 +30,6 @@ class RoleSeeder extends Seeder
                 'created_at' => Carbon::now(),
                 'upload_at' => Carbon::now()
             ]);
-        }
+        }   
     }
 }
