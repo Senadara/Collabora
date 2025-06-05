@@ -40,7 +40,6 @@ class EventController extends Controller
     public function store(Request $request)
     {
         try {
-            // Validasi input
             $validatedData = $request->validate([
                 'name_event' => 'required|string|max:255',
                 'location' => 'required|string|max:255',
@@ -60,23 +59,18 @@ class EventController extends Controller
                 $file = $request->file('image');
                 $filename = time() . '_' . $file->getClientOriginalName();
 
-                // Ambil path penyimpanan fisik dan URL path dari config
                 $storagePath = config("imagepath.folders.$folder.storage_path");
                 $urlPath = config("imagepath.folders.$folder.url_path");
 
-                // Buat direktori jika belum ada
                 if (!file_exists($storagePath)) {
                     mkdir($storagePath, 0777, true);
                 }
 
-                // Simpan file secara manual
                 $file->move($storagePath, $filename);
 
-                // Simpan path yang dapat diakses URL
                 $filePath = config("imagepath.folders.$folder.db_path") . '/' . $filename;
             }
 
-            // Simpan data ke database
             $event = new Event;
             $event->name_event = $validatedData['name_event'];
             $event->location = $validatedData['location'];
@@ -114,32 +108,29 @@ class EventController extends Controller
         ]);
     }
 
-    function update(Request $request, $id)
+    public function update(Request $request, $id)
     {
-        $event = Event::find($id);
-        $validateData = $request->validate([
-            'name_event' => 'required',
-            'location' => 'required',
-            'date' => 'required',
-            'description_event' => 'required'
+        $event = Event::findOrFail($id);
+
+        $validatedData = $request->validate([
+            'name_event' => 'required|string|max:255',
+            'location' => 'required|string|max:255',
+            'date' => 'required|date|after_or_equal:today',
+            'description_event' => 'required|string',
+        ], [
+            'date.after_or_equal' => 'Tanggal event tidak boleh di masa lalu.',
         ]);
-        $event->name_event = $validateData['name_event'];
-        $event->location = $validateData['location'];
-        $event->date = $validateData['date'];
-        $event->description_event = $validateData['description_event'];
-        $event->save();
-        return redirect()->route('index');
+        $event->update($validatedData);
+        return redirect()->back()->with('status', 'Event berhasil diperbarui.');
     }
+
     public function destroy($id)
     {
         $event = Event::findOrFail($id);
 
-        // Hapus file gambar jika ada
         if ($event->event_image) {
-            // Ambil path dari database, misal: /storage/event/123_image.jpg
             $dbPath = $event->event_image;
 
-            // Ambil folder dari path, contoh: "event"
             $segments = explode('/', trim($dbPath, '/'));
             $folder = $segments[1] ?? null; // index 0 = 'storage', index 1 = 'event'
 
@@ -155,7 +146,6 @@ class EventController extends Controller
             }
         }
 
-        // Hapus data event dari database
         $event->delete();
 
         return redirect('/event')->with('status', 'Event berhasil dihapus.');

@@ -12,19 +12,36 @@ class EventRegistController extends Controller
 {
     public function addeventregist(Request $request , $event)
 {
+     // Ambil ID user dari session
+    $userId = session('account')->id;
+
+    // Cari event berdasarkan ID
+    $eventData = Event::findOrFail($event);
+
+    // Validasi: Cegah user mendaftarkan diri ke event yang dia buat sendiri
+    if ($eventData->account_id == $userId) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Anda tidak dapat mendaftar sebagai volunteer untuk event yang Anda buat sendiri.'
+        ], 403);
+    }
+
+    // Validasi input lainnya
     $this->validate($request, [
         'phone' => 'required',
         'experience' => 'required'
     ]);
 
+    // Simpan pendaftaran volunteer
     EventRegistModel::create([
-        'account_id' => session('account')->id,
+        'account_id' => $userId,
         'phone' => $request->phone,
         'status' => 'request',
         'reward' => 'false',
         'experience' => $request->experience,
         'event_id' => $event
     ]);
+
     return response()->json([
         'status' => 'success',
         'message' => 'You have successfully registered for the event.'

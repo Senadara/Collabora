@@ -93,22 +93,29 @@
                 },
                 body: new FormData(form),
             })
-            .then(response => {
-                if (!response.ok) throw new Error('Network error');
-                return response.json();
-            })
-            .then(data => {
-                Swal.fire({
-                    title: 'Success!',
-                    text: data.message || 'You have successfully registered for the event.',
-                    icon: 'success',
-                    confirmButtonText: 'OK'
-                }).then(() => window.location.href = "/dashboard");
+            .then(async response => {
+                const data = await response.json(); // Ambil data meskipun status bukan 200
+
+                if (response.ok && data.status === 'success') {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: data.message || 'You have successfully registered for the event.',
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then(() => window.location.href = "/dashboard");
+                } else {
+                    Swal.fire({
+                        title: 'Gagal!',
+                        text: data.message || 'Terjadi kesalahan saat mendaftar.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
             })
             .catch(error => {
                 Swal.fire({
                     title: 'Error!',
-                    text: error.message || 'Failed to register for the event.',
+                    text: error.message || 'Gagal menghubungi server.',
                     icon: 'error',
                     confirmButtonText: 'OK'
                 });

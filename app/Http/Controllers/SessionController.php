@@ -48,9 +48,7 @@ class SessionController extends Controller
         }finally{
 
         }
-        // catch (\Exception $e) {
-        //     dd($e);
-        // }
+
     }
     function login(Request $request)
     {

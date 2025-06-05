@@ -10,6 +10,15 @@ class Event extends Model
     use HasFactory;
     protected $table = "event";
 
+    protected $fillable = [
+        'name_event',
+        'location',
+        'date',
+        'description_event',
+        'event_image',
+        'account_id',
+    ];
+
     public function Account() {
         return $this->belongsTo(Account::class);
     }
