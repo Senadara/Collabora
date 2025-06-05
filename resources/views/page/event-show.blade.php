@@ -78,7 +78,7 @@
     <div class="container ">
         <section class="show">
             <div class="show-image">
-                <img src="{{ asset('storage/' . $eventList->event_image) }}" alt="Event Image">
+                <img src="{{ asset($eventList->event_image) }}" alt="Event Image">
             </div>
             <div class="show-content">
                 <h2>📍{{ $eventList->location }}</h2>

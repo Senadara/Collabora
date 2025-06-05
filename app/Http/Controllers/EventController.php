@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use App\Models\Rating;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Config;
 
 class EventController extends Controller
 {
@@ -51,12 +53,27 @@ class EventController extends Controller
                 'image.mimes' => 'Format gambar tidak didukung. Gunakan jpeg, png, jpg, gif, atau svg.',
             ]);
 
-            // Proses upload file jika tersedia
             $filePath = null;
+
             if ($request->hasFile('image')) {
+                $folder = 'event';
                 $file = $request->file('image');
                 $filename = time() . '_' . $file->getClientOriginalName();
-                $filePath = $file->storeAs('event', $filename, 'public');
+
+                // Ambil path penyimpanan fisik dan URL path dari config
+                $storagePath = config("imagepath.folders.$folder.storage_path");
+                $urlPath = config("imagepath.folders.$folder.url_path");
+
+                // Buat direktori jika belum ada
+                if (!file_exists($storagePath)) {
+                    mkdir($storagePath, 0777, true);
+                }
+
+                // Simpan file secara manual
+                $file->move($storagePath, $filename);
+
+                // Simpan path yang dapat diakses URL
+                $filePath = $urlPath . '/' . $filename;
             }
 
             // Simpan data ke database
@@ -71,13 +88,11 @@ class EventController extends Controller
 
             return redirect('/event')->with('status', 'Event berhasil dibuat!');
         } catch (\Exception $e) {
-            // Tangani error (misalnya error penyimpanan, error file, dll.)
             return redirect()->back()
                 ->withErrors(['msg' => 'Gagal membuat event: ' . $e->getMessage()])
                 ->withInput();
         }
     }
-
 
 
     function show($id)
@@ -115,11 +130,18 @@ class EventController extends Controller
         $event->save();
         return redirect()->route('index');
     }
+function destroy($id)
+{
+    $event = Event::findOrFail($id);
 
-    function destroy($id)
-    {
-        $event = event::where('id', $id);
-        $event->delete();
-        return redirect('/event');
+    // Hapus gambar kalau ada
+    if ($event->event_image && File::exists(public_path($event->event_image))) {
+        File::delete(public_path($event->event_image));
     }
+
+    // Hapus event
+    $event->delete();
+
+    return redirect('/event')->with('status', 'Event berhasil dihapus.');
+}
 }

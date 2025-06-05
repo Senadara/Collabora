@@ -34,7 +34,7 @@
                 @foreach ($events as $event)
                     <div class="col">
                         <div class="card h-100">
-                            <img src="/storage/{{ $event->event_image }}" class="card-img-top" alt="...">
+                            <img src="{{ $event->event_image }}" class="card-img-top" alt="...">
                             <div class="card-body">
                                 <h5 class="card-title">{{ $event->name_event }}</h5>
                                 <h6 class="card-location">Location : {{ $event->location }}</h6>
