@@ -130,16 +130,32 @@ class EventController extends Controller
         $event->save();
         return redirect()->route('index');
     }
-    function destroy($id)
+    public function destroy($id)
     {
         $event = Event::findOrFail($id);
 
-        // Hapus gambar kalau ada
-        if ($event->event_image && File::exists(public_path($event->event_image))) {
-            File::delete(public_path($event->event_image));
+        // Hapus file gambar jika ada
+        if ($event->event_image) {
+            // Ambil path dari database, misal: /storage/event/123_image.jpg
+            $dbPath = $event->event_image;
+
+            // Ambil folder dari path, contoh: "event"
+            $segments = explode('/', trim($dbPath, '/'));
+            $folder = $segments[1] ?? null; // index 0 = 'storage', index 1 = 'event'
+
+            if ($folder && isset($segments[2])) {
+                $filename = $segments[2];
+                $storagePath = config("imagepath.folders.$folder.storage_path");
+
+                $fullPath = $storagePath . '/' . $filename;
+
+                if (File::exists($fullPath)) {
+                    File::delete($fullPath);
+                }
+            }
         }
 
-        // Hapus event
+        // Hapus data event dari database
         $event->delete();
 
         return redirect('/event')->with('status', 'Event berhasil dihapus.');

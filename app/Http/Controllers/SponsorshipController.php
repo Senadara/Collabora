@@ -86,8 +86,31 @@ class SponsorshipController extends Controller
 
     public function deny($id)
     {
-        $sponsor = Sponsorship::where('event_id', $id)->first();
-        // dd($volunteer);
+        // $sponsor = Sponsorship::where('event_id', $id)->first();
+        $sponsor = Sponsorship::findOrFail($id);
+
+        // Hapus file gambar jika ada
+        if ($sponsor->img) {
+            // Ambil path dari database, misal: /storage/sponsor/123_image.jpg
+            $dbPath = $sponsor->img;
+
+            // Ambil folder dari path, contoh: "sponsor"
+            $segments = explode('/', trim($dbPath, '/'));
+            $folder = $segments[1] ?? null; // index 0 = 'storage', index 1 = 'event'
+
+            if ($folder && isset($segments[2])) {
+                $filename = $segments[2];
+                $storagePath = config("imagepath.folders.$folder.storage_path");
+
+                $fullPath = $storagePath . '/' . $filename;
+
+                if (File::exists($fullPath)) {
+                    File::delete($fullPath);
+                }
+            }
+        }
+
+        // Hapus data sponsor dari database
         $sponsor->delete();
         return redirect('/partner');
     }
