@@ -29,23 +29,17 @@ class AccountController extends Controller
         return view('/admin/manage-account', ['accountList' => $account]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
+
+
     // Menampilkan form register
     public function create()
     {
         return view('page/register');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+
+    
 
     public function store(Request $request)
     {
@@ -60,30 +54,29 @@ class AccountController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['error' => 'Email has already been used']);
+            return response()->json([
+                'status' => 'error',
+                'messages' => $validator->errors()->all()
+            ], 422);
         }
 
-        // Hash password before saving
-        $password = bcrypt($request->password);
-
-        // Insert into database
         DB::table('accounts')->insert([
             'name' => $request->name,
             'email' => $request->email,
             'role' => 'user',
-            'password' => $password
+            'password' => bcrypt($request->password)
         ]);
 
-        return response()->json(['message' => 'You Have Created Your Account!']);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'You Have Created Your Account!'
+        ]);
     }
 
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+
+
+
     public function show($id)
     {
         //
