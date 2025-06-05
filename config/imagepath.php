@@ -1,22 +1,24 @@
 <?php
 
-$baseUrlPath = 'storage';
-$baseLocalPath = storage_path('app/public');
-$baseProductionPath = '/home/senadara/public_html/collabora.senadara.my.id/storage';
-
 $isProduction = env('APP_ENV') === 'production';
 
 return [
     'folders' => [
         'event' => [
-            'url_path' => 'storage/event',
-            'storage_path' => env('APP_ENV') === 'production'
+            'db_path' => '/storage/event',
+            'url_path' => $isProduction
+                ? '/collabora.senadara.my.id/storage/event'
+                : 'storage/event',
+            'storage_path' => $isProduction
                 ? '/home/senadara/public_html/collabora.senadara.my.id/storage/event'
                 : storage_path('app/public/event'),
         ],
         'sponsor' => [
-            'url_path' => 'storage/sponsor',
-            'storage_path' => env('APP_ENV') === 'production'
+            'db_path' => '/storage/sponsor',
+            'url_path' => $isProduction
+                ? '/collabora.senadara.my.id/storage/sponsor'
+                : 'storage/sponsor',
+            'storage_path' => $isProduction
                 ? '/home/senadara/public_html/collabora.senadara.my.id/storage/sponsor'
                 : storage_path('app/public/sponsor'),
         ],

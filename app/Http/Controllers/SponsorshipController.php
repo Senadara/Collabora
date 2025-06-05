@@ -52,7 +52,7 @@ class SponsorshipController extends Controller
             $file->move($storagePath, $filename);
 
             // Simpan path yang dapat diakses URL
-            $filePath = $urlPath . '/' . $filename;
+            $filePath = config("imagepath.folders.$folder.db_path") . '/' . $filename;
         }
 
         // Simpan ke database

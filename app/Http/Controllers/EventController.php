@@ -73,7 +73,7 @@ class EventController extends Controller
                 $file->move($storagePath, $filename);
 
                 // Simpan path yang dapat diakses URL
-                $filePath = $urlPath . '/' . $filename;
+                $filePath = config("imagepath.folders.$folder.db_path") . '/' . $filename;
             }
 
             // Simpan data ke database
@@ -130,18 +130,18 @@ class EventController extends Controller
         $event->save();
         return redirect()->route('index');
     }
-function destroy($id)
-{
-    $event = Event::findOrFail($id);
+    function destroy($id)
+    {
+        $event = Event::findOrFail($id);
 
-    // Hapus gambar kalau ada
-    if ($event->event_image && File::exists(public_path($event->event_image))) {
-        File::delete(public_path($event->event_image));
+        // Hapus gambar kalau ada
+        if ($event->event_image && File::exists(public_path($event->event_image))) {
+            File::delete(public_path($event->event_image));
+        }
+
+        // Hapus event
+        $event->delete();
+
+        return redirect('/event')->with('status', 'Event berhasil dihapus.');
     }
-
-    // Hapus event
-    $event->delete();
-
-    return redirect('/event')->with('status', 'Event berhasil dihapus.');
-}
 }
