@@ -64,6 +64,10 @@
                                             <label for="experience" class="form-label">Pengalaman</label>
                                             <input type="text" class="form-control" name="experience" placeholder="Masukkan pengalaman">
                                         </div>
+                                        <div class="mb-3">
+                                            <label for="cv" class="form-label">Upload CV</label>
+                                            <input type="file" class="form-control" name="cv" accept=".pdf,.doc,.docx">
+                                        </div>
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>

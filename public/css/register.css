@@ -1,80 +1,90 @@
-*{
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 }
 
 body {
     position: relative;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start; /* ubah dari center ke flex-start supaya konten mulai dari atas */
     min-height: 100vh;
-    background: url(/img/potret2.jpg);
+    background-color: bisque;
     background-size: cover;
     background-position: center;
-    overflow: hidden;
+    overflow-y: auto; /* biar bisa scroll vertikal */
+    padding: 40px 0; /* kasih padding atas bawah biar gak nempel ke tepi */
 }
 
 body::before {
     content: "";
-    position: absolute;
+    position: fixed; /* ubah dari absolute ke fixed supaya blur tetap fullscreen walaupun scroll */
     top: 0; left: 0;
     width: 100%; height: 100%;
-    backdrop-filter: blur(2px); /* atur tingkat blur di sini */
+    backdrop-filter: blur(2px);
+    z-index: -1;
 }
 
 
 .wrapper {
     width: 420px;
-    background: rgba(34, 40, 49, 0.8); /* warna gelap dengan transparansi */
+    background: rgba(34, 40, 49, 0.8);
     border: 2px solid rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(5px);
     color: white;
     border-radius: 10px;
     padding: 30px 40px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.3);
 }
 
-
-.wrapper h1{
+.wrapper h1 {
     font-size: 36px;
     text-align: center;
+    margin-bottom: 10px;
 }
 
-.input-box{
+.input-box {
     width: 100%;
-    height: 50px;
-    margin: 30px 0; 
+    margin: 20px 0;
+    position: relative;
 }
 
-.input-box input {
+.input-box input,
+.input-box select,
+.input-box textarea {
     width: 100%;
-    height: 100%;
     background: transparent;
-    border: none;
-    outline: none;
-    border: 2px solid #fff; /* Change border color for better visibility */
-    border-radius: 25px; /* Adjust border radius to make it more rounded */
-    padding: 20px 45px 20px 20px; /* Add padding for better text alignment */
-    color: #fff; /* Change text color for better contrast */
+    border: 2px solid #fff;
+    border-radius: 25px;
+    padding: 15px 20px;
+    color: #fff;
     font-size: 16px;
+    outline: none;
+    resize: none; /* supaya textarea ga bisa diresize */
+    transition: border-color 0.3s ease;
 }
 
-.input-box input::placeholder {
-    color: #ccc; /* Adjust placeholder color for better visibility */
+.input-box input::placeholder,
+.input-box textarea::placeholder {
+    color: #ccc;
 }
 
-
-.input-box i{
-    position: absolute;
-    right: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 20px;
+.input-box select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
 }
 
-.wrapper .btn{
+.input-box input:focus,
+.input-box select:focus,
+.input-box textarea:focus {
+    border-color: #3b82f6; /* warna biru saat fokus */
+}
+
+.wrapper .btn {
     width: 100%;
     height: 45px;
     background: white;
@@ -86,20 +96,63 @@ body::before {
     font-size: 16px;
     color: #333;
     font-weight: 600;
+    transition: background-color 0.3s ease;
 }
 
-.wrapper .register-link{
+.wrapper .btn:hover {
+    background-color: #222338;
+    color: white;
+}
+
+.wrapper .register-link {
     font-size: 14.5px;
     text-align: center;
     margin: 20px 0 15px;
 }
 
-.register-link p a{
+.register-link p a {
     color: #fff;
     text-decoration: none;
     font-weight: 600;
+    transition: color 0.3s ease;
 }
 
-.register-link p a:hover{
+.register-link p a:hover {
     text-decoration: underline;
+    color: #3b82f6;
 }
+
+/* Ganti bagian tombol di step 2 */
+.form-step div[style*="display: flex"] {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  gap: 15px; /* kasih jarak antar tombol */
+}
+
+.form-step div[style*="display: flex"] button {
+  flex: 1; /* supaya tombol lebarnya sama dan rapi */
+}
+
+.input-box select {
+  width: 100%;
+  height: 50px;
+  background: rgba(34, 40, 49, 0.8);
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+  border: 2px solid #fff;
+  border-radius: 25px;
+  padding: 0 20px;
+  color: #fff;
+  font-size: 16px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
+}
+
+/* Styling opsi dropdown */
+.input-box select option {
+  background-color: #222831; /* background gelap */
+  color: #fff; /* teks putih */
+}
+

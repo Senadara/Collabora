@@ -13,6 +13,7 @@
     transition: 0.3s color;
 }
 
+
 .logout-button {
     background-color: darkslategrey;
     color: beige;
@@ -21,7 +22,10 @@
     border-radius: 50px;
     text-decoration: none;
     transition: background-color 0.3s;
+    margin-left: 10px; 
 }
+
+
 
 .navbar-toggler{
     border: none;

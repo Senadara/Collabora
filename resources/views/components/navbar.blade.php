@@ -37,6 +37,11 @@
                             <a class="nav-link mx-lg-2" href="/#">Rewarding</a>
                         </li>
                     @endif
+                     @if (session('account')['role'] == 'user')
+                        <li class="nav-item">
+                           <a class="nav-link mx-lg-2" href="#">Account</a>
+                        </li>
+                    @endif
                     @if (session('account')['role'] == 'admin')
                         <li class="nav-item">
                             <a class="nav-link mx-lg-2" href="/admin/manage-account">Manage Account</a>
