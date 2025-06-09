@@ -7,18 +7,20 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 
 class Account extends Authenticatable
 {
-    use HasFactory;
+    use HasFactory, Notifiable;
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'foreign_key', 'other_key');
+        return $this->hasOne(User::class);
     }
-    
+
     protected $guarded = [
-        'id','role'
+        'id',
+        'role'
     ];
 
     protected $table = 'accounts';
@@ -26,7 +28,9 @@ class Account extends Authenticatable
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        'nama', 'email', 'password'
+        'nama',
+        'email',
+        'password'
     ];
 
     // protected $hidden = [
@@ -68,4 +72,3 @@ class Account extends Authenticatable
         return $this->hasMany(event::class);
     }
 }
-

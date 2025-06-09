@@ -6,10 +6,12 @@ use App\Http\Controllers\{
     AccountController,
     EventController,
     EventRegistController,
+    ForgotPasswordController,
     PageController,
     SponsorshipController,
     SessionController,
     RatingController,
+    ResetPasswordController,
     RewardController
 };
 
@@ -62,7 +64,12 @@ Route::get('/dashboard', function () {
 Route::post('/masuk', [SessionController::class, 'masuk']); // login
 Route::post('/register', [AccountController::class, 'store']); // register
 Route::get('/logout', [SessionController::class, 'logout']);
-Route::get('/forgot-password', fn () => view('page.forgot-pass'));
+// Route::get('/forgot-password', fn () => view('page.forgot-pass'));
+
+Route::get('forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+Route::post('reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
 
 // -------------------- EVENT --------------------
 Route::get('/event', [EventController::class, 'index']);
