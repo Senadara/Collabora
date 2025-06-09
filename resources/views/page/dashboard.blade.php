@@ -21,7 +21,7 @@
 
             <br><br>
             <div class="heading">
-                <h1><b>Upcoming Event</b></h1>
+                <h1><b> Our Event</b></h1>
             </div>
 
             <form action="{{ route('event.search') }}" method="GET" class="d-flex col-4" target="_self">
