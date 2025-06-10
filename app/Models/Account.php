@@ -69,6 +69,6 @@ class Account extends Authenticatable
 
     function event()
     {
-        return $this->hasMany(event::class);
+        return $this->hasMany(Event::class);
     }
 }
