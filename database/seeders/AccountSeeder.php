@@ -17,13 +17,13 @@ class AccountSeeder extends Seeder
      */
     public function run()
     {
-        //
-        // DB::table('accounts')->insert([
-        //     'name' => 'Admin',
-        //     'email' => 'koh@gmail.com',
-        //     'password' => Hash::make('321'),
-        //     'role' => 'admin'
-        // ]);
+        
+        DB::table('accounts')->insert([
+            'name' => 'Admin',
+            'email' => 'koh@gmail.com',
+            'password' => Hash::make('321'),
+            'role' => 'admin'
+        ]);
         Account::factory()->count(5)->hasUser()->create();
     }
 }
