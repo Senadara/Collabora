@@ -49,5 +49,4 @@ class AddSponsorshipTest extends TestCase
             'status' => 'request',
         ]);
     }
-
 }

@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Account;
 use App\Models\User;
+use App\Models\Event;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
@@ -17,18 +18,18 @@ class LoginTest extends TestCase
     {
         Account::create([
             'name' => 'Test User',
-            'email' => 'user@test.com',
-            'password' => Hash::make('password123'),
+            'email' => 'email@gmail.com',
+            'password' => Hash::make('cobacoba'),
             'role' => 'user',
         ]);
 
         $response = $this->post('/masuk', [
-            'email' => 'user@test.com',
-            'password' => 'password123',
+            'email' => 'email@gmail.com',
+            'password' => 'cobacoba',
         ]);
 
         $response->assertRedirect('/dashboard');
-        $this->assertEquals(session('account')->email, 'user@test.com');
+        $this->assertEquals(session('account')->email, 'email@gmail.com');
     }
 
     /** @test */
@@ -51,7 +52,7 @@ class LoginTest extends TestCase
         $this->assertNull(session('account'));
     }
 
-    /** @test */
+    // /** @test */
     public function test_masuk_gagal_dengan_email_tidak_terdaftar()
     {
         $response = $this->from('/account')->post('/masuk', [
@@ -74,5 +75,32 @@ class LoginTest extends TestCase
 
         $response->assertRedirect('/account');
         $response->assertSessionHasErrors(['email', 'password']);
+    }
+
+    /** @test */
+    public function it_should_store_rating_successfully()
+    {
+        $account = Account::factory()->create();
+        $event = Event::factory()->create();
+
+        $this->withSession([
+            'account' => ['id' => $account->id]
+        ]);
+
+        $response = $this->post('/rating', [
+            'event_id' => $event->id,
+            'feedback' => 'Acara luar biasa!',
+            'star' => 5,
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success', 'Rating berhasil ditambahkan!');
+
+        $this->assertDatabaseHas('ratings', [
+            'account_id' => $account->id,
+            'event_id' => $event->id,
+            'feedback' => 'Acara luar biasa!',
+            'star' => 5,
+        ]);
     }
 }
