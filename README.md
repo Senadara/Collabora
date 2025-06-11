@@ -23,7 +23,11 @@ setelah memasuki direktori Collabora buka IDE (VsCode)
 ```bash
 code .
 ```
-setelah IDE terbuka tambahkan file .env lalu isi dengan kode berikut
+buka terminal pada vs code (ctrl+shift+`) lalu install composer
+```bash
+composer install
+```
+setelah composer terinstall tambahkan file .env lalu isi dengan kode berikut
 ```bash
 APP_NAME=Laravel
 APP_ENV=local
