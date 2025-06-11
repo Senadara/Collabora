@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Validator;
 
 class RatingController extends Controller
 {
-    // use HasFactory;  
+    // use HasFactory;
 
     // CRUD Functions
 
@@ -27,19 +27,27 @@ class RatingController extends Controller
             'feedback' => 'required|string|max:255',
             'star' => 'required|integer|min:1|max:5',
         ]);
-        
+
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator, 'rating')->withInput();
         }
 
         $userId = session('account')['id'];
 
+        // Rating::create([
+        //     'user_id' => $userId,
+        //     'event_id' => $request->event_id,
+        //     'feedback' => $request->feedback,
+        //     'star' => $request->star,
+        // ]);
+
         Rating::create([
-            'user_id' => $userId,
+            'account_id' => $userId, // ✅ Ubah dari 'user_id' ke 'account_id'
             'event_id' => $request->event_id,
             'feedback' => $request->feedback,
             'star' => $request->star,
         ]);
+
 
         return redirect()->back()->with('success', 'Rating berhasil ditambahkan!');
     }
