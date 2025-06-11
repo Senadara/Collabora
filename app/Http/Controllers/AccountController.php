@@ -28,6 +28,9 @@ class AccountController extends Controller
         return view('page/register');
     }
 
+
+    
+
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
