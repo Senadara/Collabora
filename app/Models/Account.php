@@ -28,9 +28,10 @@ class Account extends Authenticatable
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        'nama',
+        'name',
         'email',
-        'password'
+        'password',
+        'role'
     ];
 
     // protected $hidden = [
