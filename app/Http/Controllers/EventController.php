@@ -27,13 +27,13 @@ class EventController extends Controller
     {
         $event = Event::all();
         $search = $request->search;
-        $event = event::where('name_event', 'LIKE', '%' . $search . '%')->get();
+        $event = Event::where('name_event', 'LIKE', '%' . $search . '%')->get();
         return view('page/dashboard', ['events' => $event]);
     }
 
     function create()
     {
-        $class = event::all();
+        $class = Event::all();
         return view('page/create-event', ['class' => $class]);
     }
 

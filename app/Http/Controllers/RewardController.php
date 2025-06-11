@@ -17,7 +17,7 @@ class RewardController extends Controller
     }
     public function showAcc($id)
     {
-        $data = event::where('id', $id)->first();
+        $data = Event::where('id', $id)->first();
         $reward = Reward::where('event_id', $id)->get();
         return view('page/partner', ['partnerList' => $reward, 'event' => $data]);
     }
