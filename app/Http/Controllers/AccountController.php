@@ -11,35 +11,22 @@ use App\Models\User;
 
 class AccountController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    // Menampilkan form login
+
     function index()
     {
         return view('page/login');
     }
 
-    // Menampilkan semua data account
     function manage()
     {
         $account = Account::all();
         return view('/admin/manage-account', ['accountList' => $account]);
     }
 
-
-
-
-    // Menampilkan form register
     public function create()
     {
         return view('page/register');
     }
-
-
-    
 
     public function store(Request $request)
     {
@@ -73,35 +60,11 @@ class AccountController extends Controller
         ]);
     }
 
-
-
-
-
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    // Menampilkan form edit
     public function edit(Account $account)
     {
         return view('page.account-edit', compact('account'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    // Fungsional Edit
     public function update(Request $request, Account $account)
     {
 
@@ -120,26 +83,11 @@ class AccountController extends Controller
         return redirect()->route('manage');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    // Fungsional Delete
-    // public function destroy(Account $account)
-    // {
-    //     $account->delete();
-    //     return redirect('/admin/manage-account');
-    // }
-
     public function destroy(Account $account)
     {
         $account->delete();
         return redirect()->route('manage')->with('success', 'Account has been deleted successfully');
     }
-
-
 
     // Menampilkan form forgot password
     public function forgot()
