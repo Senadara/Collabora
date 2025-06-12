@@ -9,7 +9,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Session;
 use Tests\TestCase;
 
-class ViewVolunteerTest extends TestCase
+class EventRegistControllerTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -129,5 +129,45 @@ class ViewVolunteerTest extends TestCase
         $response->assertSee('Accepted Volunteer One');
         $response->assertDontSee('Requested Volunteer Two'); // Requested volunteer should not be seen
         $response->assertSee('Accepted Volunteer Three');
+    }
+
+    /**
+     * Test that an admin can accept a new volunteer for an event they created.
+     *
+     * @return void
+     */
+    public function test_admin_can_accept_new_volunteer_for_their_event()
+    {
+        // The admin account is already created in setUp() and stored in the session.
+        $adminAccount = Session::get('account');
+
+        // Create an event owned by this admin
+        $event = Event::factory()->create(['account_id' => $adminAccount->id]);
+
+        // Create a volunteer account
+        $volunteer = Account::factory()->create(['name' => 'New Volunteer']);
+
+        // Create an EventRegistModel entry for this volunteer with 'request' status
+        $registration = EventRegistModel::create([
+            'account_id' => $volunteer->id,
+            'event_id' => $event->id,
+            'phone' => '444444444',
+            'experience' => 'Some new experience',
+            'status' => 'request',
+            'reward' => 'false',
+        ]);
+
+        // Act as the admin and call the accept route
+        $response = $this->actingAs($adminAccount)->get(route('accept.volunteer', ['id' => $registration->id]));
+
+        // Assert that the response redirects (status 302)
+        $response->assertStatus(302);
+        $response->assertRedirect('/event'); // Assuming it redirects back to the event list or a relevant page
+
+        // Assert that the volunteer's status has been updated to 'accepted' in the database
+        $this->assertDatabaseHas('event_regist', [
+            'id' => $registration->id,
+            'status' => 'accepted',
+        ]);
     }
 }
