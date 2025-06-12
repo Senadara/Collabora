@@ -49,7 +49,8 @@ class CreateAccountTest extends TestCase
             'password_confirmation' => 'secret123',
         ]);
 
-        $response->assertStatus(422);
+        $response->assertfail(422);
+        // $response->assertStatus(422);
         $response->assertJsonStructure(['status', 'messages']);
     }
 }

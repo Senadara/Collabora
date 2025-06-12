@@ -48,7 +48,7 @@ class LoginTest extends TestCase
         ]);
 
         $response->assertRedirect('/account');
-        $response->assertSessionHasErrors(); // ada error apapun
+        $response->assertfail(); // ada error apapun
         $this->assertNull(session('account'));
     }
 
@@ -61,7 +61,7 @@ class LoginTest extends TestCase
         ]);
 
         $response->assertRedirect('/account');
-        $response->assertSessionHasErrors(['error' => 'Email tidak ditemukan']);
+        $response->assertfail(['error' => 'Email tidak ditemukan']);
         $this->assertNull(session('account'));
     }
 

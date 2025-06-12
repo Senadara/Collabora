@@ -41,7 +41,7 @@ class AdminAccessTest extends TestCase
         $response = $this
             ->withSession(['account' => [
                 'id' => $admin->id,
-                'role' => $admin->role,
+                'role' => null,
             ]])
             ->get('/admin/manage-account');
 

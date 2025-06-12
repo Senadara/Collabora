@@ -68,9 +68,41 @@ class EventRegistTest extends TestCase
 
         $this->withSession(['account' => $account])
             ->postJson(route('regist.event', ['event' => $event->id]), [
-                // Tidak mengisi 'phone' dan 'experience'
+                'phone' => '',
+                'experience' => '',
+                'cv' => "",
             ])
-            ->assertStatus(422) // validasi gagal dengan JSON response
+            ->assertFalse(422) // validasi gagal dengan JSON response
             ->assertJsonValidationErrors(['phone', 'experience']);
+    }
+
+    public function test_user_can_register_with_same_number()
+    {
+        Storage::fake('public');
+
+        $account = Account::factory()->create();
+        $eventOwner = Account::factory()->create();
+        $event = Event::factory()->create(['account_id' => $eventOwner->id]);
+
+        $cv = UploadedFile::fake()->create('cv.pdf', 100, 'application/pdf');
+
+        $this->withSession(['account' => $account])
+            ->postJson(route('regist.event', ['event' => $event->id]), [
+                'phone' => '08123456789',
+                'experience' => 'Fresh graduate',
+                'cv' => $cv,
+            ])
+            ->assertStatus(200)
+            ->assertJson([
+                'status' => 'success',
+                'message' => 'You have successfully registered for the event.',
+            ]);
+
+        $this->assertDatabaseHas('event_regist', [
+            'account_id' => $account->id,
+            'event_id' => $event->id,
+            'status' => 'request',
+            'reward' => 'false',
+        ]);
     }
 }
