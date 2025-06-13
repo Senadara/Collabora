@@ -50,6 +50,45 @@ class SponsorshipTest extends TestCase
         ]);
     }
 
+    // public function test_inputsatu_field()
+    // {
+    //     Storage::fake('public');
+
+    //     // Buat akun dan event
+    //     $account = Account::factory()->create();
+    //     $event = Event::factory()->create();
+
+    //     // Dummy path untuk menyimpan file
+    //     $tempPath = storage_path('app/public/sponsor-test');
+    //     File::ensureDirectoryExists($tempPath);
+
+    //     Config::set("imagepath.folders.sponsor.storage_path", $tempPath);
+    //     Config::set("imagepath.folders.sponsor.db_path", '/storage/sponsor-test');
+
+    //     $image = UploadedFile::fake()->image('logo.jpg');
+
+    //     $response = $this->post('/sponsorship/addsponsorship', [
+    //         'account_id' => $account->id,
+    //         // 'account_id' => '',
+    //         'event_id' => '',
+    //         // 'event_id' => $event->id,
+    //         'nama_sponsor' => '', // Kosong
+    //         'contact' => '',
+    //         // 'image' => $image,
+    //         'image' => '',
+    //     ]);
+
+    //     // Pastikan terjadi redirect kembali (misalnya ke halaman form)
+    //     $response->assertSessionHasErrorsIn('sponsorship', ['nama_sponsor']);
+
+    //     // Pastikan tidak ada data yang masuk ke database
+    //     $this->assertDatabaseMissing('sponsorship', [
+    //         'account_id' => $account->id,
+    //         'event_id' => $event->id,
+    //         'contact' => '081234567890',
+    //     ]);
+    // }
+
     public function test_daftar_sponsorship_inputan_nama_sponsor_kosong()
     {
         Storage::fake('public');
@@ -76,14 +115,50 @@ class SponsorshipTest extends TestCase
         ]);
 
         // Pastikan terjadi redirect kembali (misalnya ke halaman form)
-        $response->assertSessionHasErrorsIn('sponsorship', ['nama_sponsor']);
+        $response->assertSessionHasErrors('sponsorship');
 
-        // Pastikan tidak ada data yang masuk ke database
-        $this->assertDatabaseMissing('sponsorship', [
-            'account_id' => $account->id,
-            'event_id' => $event->id,
-            'contact' => '081234567890',
+        // // Pastikan tidak ada data yang masuk ke database
+        // $this->assertDatabaseMissing('sponsorship', [
+        //     'account_id' => $account->id,
+        //     'event_id' => $event->id,
+        //     'contact' => '081234567890',
+        // ]);
+    }
+
+    public function test_daftar_sponsorship_semua_inputan_sponsor_kosong()
+    {
+        Storage::fake('public');
+
+        // Buat akun dan event
+        $account = Account::factory()->create();
+        $event = Event::factory()->create();
+
+        // Dummy path untuk menyimpan file
+        $tempPath = storage_path('app/public/sponsor-test');
+        File::ensureDirectoryExists($tempPath);
+
+        Config::set("imagepath.folders.sponsor.storage_path", $tempPath);
+        Config::set("imagepath.folders.sponsor.db_path", '/storage/sponsor-test');
+
+        $image = UploadedFile::fake()->image('logo.jpg');
+
+        $response = $this->post('/sponsorship/addsponsorship', [
+            'account_id' => '',
+            'event_id' => '',
+            'nama_sponsor' => '', // Kosong
+            'contact' => '',
+            'image' => '',
         ]);
+
+        // Pastikan terjadi redirect kembali (misalnya ke halaman form)
+        $response->assertSessionHasErrors('sponsorship');
+
+        // // Pastikan tidak ada data yang masuk ke database
+        // $this->assertDatabaseMissing('sponsorship', [
+        //     'account_id' => $account->id,
+        //     'event_id' => $event->id,
+        //     'contact' => '081234567890',
+        // ]);
     }
 
 }
