@@ -22,6 +22,10 @@ return new class extends Migration
             $table->string('instagram_handle')->nullable();
             $table->timestamps();
 
+            $table->string('ktp_photo')->nullable();
+            $table->string('selfie_photo')->nullable();
+            $table->enum('creator_request_status', ['not-registered','pending', 'approved', 'rejected'])->default('not-registered');
+
             $table->foreign('account_id')->references('id')->on('accounts')->onDelete('cascade');
         });
     }

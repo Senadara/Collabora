@@ -33,6 +33,16 @@
                         </li>
                     @endif
                     @if (auth()->user()->role == 'user')
+                            <li class="nav-item">
+                            <a class="nav-link mx-lg-2" href="/daftar-creator">Regis Event Creator</a>
+                        </li>
+                    @endif
+                    @if (auth()->user()->role == 'admin')
+                            <li class="nav-item">
+                            <a class="nav-link mx-lg-2" href="/creator-requests">Regis Event Creator</a>
+                        </li>
+                    @endif
+                    @if (auth()->user()->role == 'user')
                         <li class="nav-item">
                             <a class="nav-link mx-lg-2" href="/#">Rewarding</a>
                         </li>
