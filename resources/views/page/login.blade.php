@@ -12,7 +12,7 @@
 </head>
 <body>
     <div class="wrapper">
-         <form action="/masuk" method="POST">
+         <form action="/login" method="POST">
          @csrf
          <h1>Login</h1>
 

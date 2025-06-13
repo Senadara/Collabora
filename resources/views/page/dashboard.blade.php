@@ -7,7 +7,7 @@
         <div class="slide-content">
             <br><br><br>
             <div class="judul2">
-                <h1><b>Hi, {{ session('account')['name'] }}!</b></h1>
+                <h1><b>Hi, {{ auth()->user()->name }}!</b></h1>
             </div>
 
             <br>

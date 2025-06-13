@@ -127,11 +127,7 @@
 </body>
 <script>
     document.querySelector('.login-btn').addEventListener('click', function() {
-        window.location.href = '/account';
-    });
-
-      document.querySelector('.login-btn').addEventListener('click', function() {
-        window.location.href = '/account';
+        window.location.href = '/login-page';
     });
 
     document.querySelector('.event-btn').addEventListener('click', function() {

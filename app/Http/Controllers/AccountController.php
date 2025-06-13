@@ -14,7 +14,7 @@ class AccountController extends Controller
 
     function index()
     {
-        return view('page/login');
+
     }
 
     function manage()

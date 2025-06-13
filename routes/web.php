@@ -29,9 +29,7 @@ use App\Models\Event;
 Route::get('/copy-assets', function () {
     $sourcePath = '/home/senadara/repositories/Collabora/public';
     $targetPath = '/home/senadara/public_html/collabora.senadara.my.id';
-
     $foldersToCopy = ['img', 'css'];
-
     foreach ($foldersToCopy as $folder) {
         $source = $sourcePath . '/' . $folder;
         $target = $targetPath . '/' . $folder;
@@ -44,9 +42,19 @@ Route::get('/copy-assets', function () {
         // Copy folder dari source ke target
         File::copyDirectory($source, $target);
     }
-
     return "Folder img dan css berhasil di-copy ke $targetPath";
 });
+
+// -------------------- AUTH --------------------
+Route::middleware('guest')->group(function () {
+    Route::get('/login-page', [SessionController::class, 'index'])->name('login');
+    Route::post('/login', [SessionController::class, 'login']);
+    Route::get('/register', [SessionController::class, 'create']);
+    Route::post('/register', [SessionController::class, 'register']);
+});
+
+
+
 
 // Landing & Dashboard
 Route::get('/', function () {
@@ -54,16 +62,16 @@ Route::get('/', function () {
     return view('welcome', ['latestEvents' => $latestEvents]);
 });
 
-Route::get('/dashboard', function () {
-    $accounts = App\Models\Account::all();
-    $events = App\Models\Event::all();
-    return view('page.dashboard', ['events' => $events]);
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', function () {
+        $events = App\Models\Event::all();
+        return view('page.dashboard', ['events' => $events]);
+    });
+    Route::get('/logout', [SessionController::class, 'logout']);
 });
-
 // -------------------- AUTH --------------------
-Route::post('/masuk', [SessionController::class, 'masuk']); // login
-Route::post('/register', [AccountController::class, 'store']); // register
-Route::get('/logout', [SessionController::class, 'logout']);
+// Route::post('/register', [AccountController::class, 'store']); // register
+
 // Route::get('/forgot-password', fn () => view('page.forgot-pass'));
 
 Route::get('forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
