@@ -20,6 +20,29 @@ class SessionController extends Controller
     }
 
     // Proses login
+    // public function login(Request $request)
+    // {
+    //     $credentials = $request->validate([
+    //         'email' => 'required|email',
+    //         'password' => 'required'
+    //     ]);
+
+    //     // Coba login
+    //     if (Auth::attempt($credentials)) {
+    //         $request->session()->regenerate(); // amankan session baru
+    //         return redirect()->intended('/dashboard')->with('success', 'Berhasil login');
+    //     }
+
+    //     return back()->withErrors([
+    //         'email' => 'Email atau password salah',
+    //     ])->onlyInput('email');
+    // }
+
+    // eca
+    //     use Illuminate\Support\Facades\Auth;
+    // use App\Models\Account;
+
+    // eca
     public function login(Request $request)
     {
         $credentials = $request->validate([
@@ -27,9 +50,13 @@ class SessionController extends Controller
             'password' => 'required'
         ]);
 
-        // Coba login
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate(); // amankan session baru
+
+            // Simpan user ke dalam session 'account'
+            $user = Auth::user();
+            session(['account' => $user]);
+
             return redirect()->intended('/dashboard')->with('success', 'Berhasil login');
         }
 
@@ -37,6 +64,7 @@ class SessionController extends Controller
             'email' => 'Email atau password salah',
         ])->onlyInput('email');
     }
+
 
     // Proses logout
     public function logout(Request $request)
