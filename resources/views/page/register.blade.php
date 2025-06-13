@@ -91,7 +91,7 @@
       </div>
 
       <div class="register-link" style="margin-top: 20px; text-align: center;">
-        <p>Already have an account? <a href="/account">Login</a></p>
+        <p>Already have an account? <a href="/login-page">Login</a></p>
       </div>
     </form>
   </div>
@@ -173,7 +173,7 @@
                 confirmButtonText: "OK",
               }).then((result) => {
                 if (result.isConfirmed) {
-                  window.location.href = "/account";
+                  window.location.href = "/login-page";
                 }
               });
             } else if (data.error) {

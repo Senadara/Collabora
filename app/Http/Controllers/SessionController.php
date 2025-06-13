@@ -3,99 +3,80 @@
 namespace App\Http\Controllers;
 
 use App\Models\Account;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Session;
-use PharIo\Manifest\Email;
-
-// use Illuminate\Support\Facades\Hash;
-
 
 class SessionController extends Controller
 {
-    //Menampilkan form login
-    function index()
+    // Tampilkan form login
+    public function index()
     {
-        $account = Account::all();
-        return view('page/login', ['accountList' => $account]);
-    }
-
-    // Fungsional Login
-    function masuk(Request $request)
-    {
-        try {
-            Session::flash('email', $request->email);
-            $request->validate([
-                'email' => 'required|email',
-                'password' => 'required'
-            ]);
-
-            // $data = Account::where('email', $request->email)->firstOrFail();
-            $data = Account::where('email', $request->email)->first();
-            if (!$data) {
-                return redirect('/account')->withErrors(['error' => 'Email tidak ditemukan']);
-            }
-
-            
-            if (Hash::check($request->password, $data->password)) {
-                session(['account' => $data]);
-                return redirect('/dashboard')->with('success', 'berhasil login');
-            } else {
-                return redirect('/account')->withErrors('Email dan Password yang dimasukkan tidak valid');
-            }
-        }finally{
-
+        if (Auth::check()) {
+            return redirect('/dashboard');
         }
 
+        return view('page.login');
     }
-    function login(Request $request)
+
+    // Proses login
+    public function login(Request $request)
     {
-        if (session()->has('account')) {
-            session()->pull('account');
+        $credentials = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required'
+        ]);
+
+        // Coba login
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate(); // amankan session baru
+            return redirect()->intended('/dashboard')->with('success', 'Berhasil login');
         }
-        return redirect('/dashboard');
+
+        return back()->withErrors([
+            'email' => 'Email atau password salah',
+        ])->onlyInput('email');
     }
 
-    // Fungsional Logout
-    public function logout()
+    // Proses logout
+    public function logout(Request $request)
     {
-        if (session()->has('account')) {
-            session()->flush();
+        Auth::logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect('/')->with('success', 'Berhasil logout');
+    }
+
+    // Tampilkan form register
+    public function create()
+    {
+        if (Auth::check()) {
+            return redirect('/dashboard');
         }
-        return redirect('/')->with('success', 'Berhasil Logout');
+
+        return view('page.register');
     }
 
-    //Menampilkan form register
-    function create()
+    // Proses register
+    public function register(Request $request)
     {
-        return view("page/register");
-    }
+        $validated = $request->validate([
+            'name' => 'required',
+            'email' => 'required|email|unique:accounts',
+            'password' => 'required|confirmed|min:6'
+        ]);
 
-    // Fungsional Register
-    function register(Request $request)
-    {
-        try {
-            $request->validate([
-                'name' => 'required',
-                'email' => 'required|email|unique:accounts',
-                'password' => 'required|confirmed|min:6'
-            ]);
-        
-            // Create user
-            $user = new User();
-            $user->name = $request->name;
-            $user->email = $request->email;
-            $user->role = 'user';
-            $user->password = Hash::make($request->password);
-            $user->save();
-        
-            return redirect('/login')->with('success', 'Registrasi berhasil!');
+        $account = Account::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'role' => 'user',
+            'password' => Hash::make($validated['password']),
+        ]);
 
-            
-        } catch (\Exception $e) {
-            return redirect('/register')->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
-        }
+        Auth::login($account);
+
+        return redirect('/dashboard')->with('success', 'Registrasi dan login berhasil');
     }
 }

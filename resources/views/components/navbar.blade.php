@@ -27,22 +27,22 @@
                     <li class="nav-item">
                         <a class="nav-link mx-lg-2" href="/dashboard">Dashboard</a>
                     </li>
-                    @if (session('account')['role'] == 'user')
+                    @if (auth()->user()->role == 'event-creator')
                         <li class="nav-item">
                             <a class="nav-link mx-lg-2" href="/event">Event</a>
                         </li>
                     @endif
-                    @if (session('account')['role'] == 'user')
+                    @if (auth()->user()->role == 'user')
                         <li class="nav-item">
                             <a class="nav-link mx-lg-2" href="/#">Rewarding</a>
                         </li>
                     @endif
-                     @if (session('account')['role'] == 'user')
+                     @if (auth()->user()->role == 'user')
                         <li class="nav-item">
                            <a class="nav-link mx-lg-2" href="#">Account</a>
                         </li>
                     @endif
-                    @if (session('account')['role'] == 'admin')
+                    @if (auth()->user()->role == 'admin')
                         <li class="nav-item">
                             <a class="nav-link mx-lg-2" href="/admin/manage-account">Manage Account</a>
                         </li>
