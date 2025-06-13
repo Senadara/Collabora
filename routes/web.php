@@ -23,7 +23,7 @@ use App\Models\Event;
 | Web Routes
 |--------------------------------------------------------------------------
 | Web routes untuk aplikasi ini
-|-------------------------------------------------------------------------- 
+|--------------------------------------------------------------------------
 */
 
 Route::get('/copy-assets', function () {
@@ -107,6 +107,12 @@ Route::post('/biodata/create', [AccountController::class, 'createBiodata']);
 Route::put('/biodata/update/{account_id}', [AccountController::class, 'updateBiodata']);
 
 //Route::get('/admin/manage-account/{account}', [AccountController::class, 'destroy'])->name('account.destroy');
+
+// -------------------- REWARDING -------------------- //edit eventregistcontroller atau tambah controller baru
+Route::get('/rewarding', [EventController::class, 'rewarding'])->name('rewarding');
+Route::post('/rewarding', [EventController::class, 'store']);
+Route::get('/rewarding/show/{id}', [EventController::class, 'show']);
+Route::get('/search', [EventController::class, 'search'])->name('event.search');
 
 // -------------------- REWARD --------------------
 Route::get('/download-certificate', [RewardController::class, 'download'])->name('certificate.download');

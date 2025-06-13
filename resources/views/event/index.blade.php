@@ -18,7 +18,7 @@
                 <th>Name Event</th>
                 <th>Location</th>
                 <th>Date</th>
-                <th>Deskripsion</th>
+                <th>Description</th>
                 <th>Action</th>
             </tr>
         </thead>
