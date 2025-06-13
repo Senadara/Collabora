@@ -13,9 +13,28 @@ class EventController extends Controller
     //
     function index()
     {
-        $event = Event::where('account_id', session('account')->id)->get();
+        // $event = Event::where('account_id', session('account')->id)->get();
+        // return view('event/index', ['eventList' => $event]);
+
+        $account = session('account');
+        if (!$account) {
+            return redirect('/login-page')->withErrors('Silakan login terlebih dahulu.');
+        }
+
+        $event = Event::where('account_id', $account->id)->get();
         return view('event/index', ['eventList' => $event]);
     }
+
+    // eca
+    public function rewarding()
+    {
+        $events = Event::where('account_id', session('account')->id)->get();
+
+        return view('page/rewarding', [
+            'eventList' => $events
+        ]);
+    }
+
 
     function adminEvent()
     {
@@ -37,56 +56,107 @@ class EventController extends Controller
         return view('page/create-event', ['class' => $class]);
     }
 
+    // public function store(Request $request)
+    // {
+    //     try {
+    //         $validatedData = $request->validate([
+    //             'name_event' => 'required|string|max:255',
+    //             'location' => 'required|string|max:255',
+    //             'date' => ['required', 'date', 'after_or_equal:today'],
+    //             'description_event' => 'required|string',
+    //             'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+    //         ], [
+    //             'date.after_or_equal' => 'Tanggal event tidak boleh di masa lalu.',
+    //             'image.image' => 'File harus berupa gambar.',
+    //             'image.mimes' => 'Format gambar tidak didukung. Gunakan jpeg, png, jpg, gif, atau svg.',
+    //         ]);
+
+    //         $filePath = null;
+
+    //         if ($request->hasFile('image')) {
+    //             $folder = 'event';
+    //             $file = $request->file('image');
+    //             $filename = time() . '_' . $file->getClientOriginalName();
+
+    //             $storagePath = config("imagepath.folders.$folder.storage_path");
+    //             $urlPath = config("imagepath.folders.$folder.url_path");
+
+    //             if (!file_exists($storagePath)) {
+    //                 mkdir($storagePath, 0777, true);
+    //             }
+
+    //             $file->move($storagePath, $filename);
+
+    //             $filePath = config("imagepath.folders.$folder.db_path") . '/' . $filename;
+    //         }
+
+    //         $event = new Event;
+    //         $event->name_event = $validatedData['name_event'];
+    //         $event->location = $validatedData['location'];
+    //         $event->date = $validatedData['date'];
+    //         $event->description_event = $validatedData['description_event'];
+    //         $event->event_image = $filePath;
+    //         $event->account_id = session('account')->id;
+    //         $event->save();
+
+    //         return redirect('/event')->with('status', 'Event berhasil dibuat!');
+    //     } catch (\Exception $e) {
+    //         return redirect()->back()
+    //             ->withErrors(['msg' => 'Gagal membuat event: ' . $e->getMessage()])
+    //             ->withInput();
+    //     }
+    // }
+
+    // eca
     public function store(Request $request)
-    {
-        try {
-            $validatedData = $request->validate([
-                'name_event' => 'required|string|max:255',
-                'location' => 'required|string|max:255',
-                'date' => ['required', 'date', 'after_or_equal:today'],
-                'description_event' => 'required|string',
-                'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            ], [
-                'date.after_or_equal' => 'Tanggal event tidak boleh di masa lalu.',
-                'image.image' => 'File harus berupa gambar.',
-                'image.mimes' => 'Format gambar tidak didukung. Gunakan jpeg, png, jpg, gif, atau svg.',
-            ]);
-
-            $filePath = null;
-
-            if ($request->hasFile('image')) {
-                $folder = 'event';
-                $file = $request->file('image');
-                $filename = time() . '_' . $file->getClientOriginalName();
-
-                $storagePath = config("imagepath.folders.$folder.storage_path");
-                $urlPath = config("imagepath.folders.$folder.url_path");
-
-                if (!file_exists($storagePath)) {
-                    mkdir($storagePath, 0777, true);
-                }
-
-                $file->move($storagePath, $filename);
-
-                $filePath = config("imagepath.folders.$folder.db_path") . '/' . $filename;
-            }
-
-            $event = new Event;
-            $event->name_event = $validatedData['name_event'];
-            $event->location = $validatedData['location'];
-            $event->date = $validatedData['date'];
-            $event->description_event = $validatedData['description_event'];
-            $event->event_image = $filePath;
-            $event->account_id = session('account')->id;
-            $event->save();
-
-            return redirect('/event')->with('status', 'Event berhasil dibuat!');
-        } catch (\Exception $e) {
-            return redirect()->back()
-                ->withErrors(['msg' => 'Gagal membuat event: ' . $e->getMessage()])
-                ->withInput();
-        }
+{
+    $account = session('account');
+    if (!$account) {
+        return redirect('/login-page')->withErrors('Silakan login terlebih dahulu.');
     }
+
+    $validatedData = $request->validate([
+        'name_event' => 'required|string|max:255',
+        'location' => 'required|string|max:255',
+        'date' => ['required', 'date', 'after_or_equal:today'],
+        'description_event' => 'required|string',
+        'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+    ], [
+        'date.after_or_equal' => 'Tanggal event tidak boleh di masa lalu.',
+        'image.image' => 'File harus berupa gambar.',
+        'image.mimes' => 'Format gambar tidak didukung.',
+    ]);
+
+    $filePath = null;
+
+    if ($request->hasFile('image')) {
+        $folder = 'event';
+        $file = $request->file('image');
+        $filename = time() . '_' . $file->getClientOriginalName();
+
+        $storagePath = config("imagepath.folders.$folder.storage_path");
+        $urlPath = config("imagepath.folders.$folder.url_path");
+
+        if (!file_exists($storagePath)) {
+            mkdir($storagePath, 0777, true);
+        }
+
+        $file->move($storagePath, $filename);
+        $filePath = config("imagepath.folders.$folder.db_path") . '/' . $filename;
+    }
+
+    $event = new Event;
+    $event->name_event = $validatedData['name_event'];
+    $event->location = $validatedData['location'];
+    $event->date = $validatedData['date'];
+    $event->description_event = $validatedData['description_event'];
+    $event->event_image = $filePath;
+    $event->account_id = $account->id;
+    $event->save();
+
+    return redirect('/event')->with('status', 'Event berhasil dibuat!');
+}
+
 
 
     function show($id)

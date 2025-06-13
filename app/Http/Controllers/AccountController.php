@@ -28,40 +28,70 @@ class AccountController extends Controller
         return view('page/register');
     }
 
+    // public function store(Request $request)
+    // {
+    //     $validator = Validator::make($request->all(), [
+    //         'name' => 'required',
+    //         'email' => 'required|email|unique:accounts,email',
+    //         'password' => 'required|confirmed|min:6'
+    //     ], [
+    //         'email.unique' => 'Akun sudah digunakan!',
+    //         'email.email' => 'Format email tidak valid.',
+    //         'password.confirmed' => 'Konfirmasi password tidak cocok.',
+    //     ]);
 
-    
+    //     if ($validator->fails()) {
+    //         return response()->json([
+    //             'status' => 'error',
+    //             'messages' => $validator->errors()->all()
+    //         ], 422);
+    //     }
+
+    //     DB::table('accounts')->insert([
+    //         'name' => $request->name,
+    //         'email' => $request->email,
+    //         'role' => 'user',
+    //         'password' => bcrypt($request->password)
+    //     ]);
+
+    //     return response()->json([
+    //         'status' => 'success',
+    //         'message' => 'You Have Created Your Account!'
+    //     ]);
+    // }
 
     public function store(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'email' => 'required|email|unique:accounts,email',
-            'password' => 'required|confirmed|min:6'
-        ], [
-            'email.unique' => 'Akun sudah digunakan!',
-            'email.email' => 'Format email tidak valid.',
-            'password.confirmed' => 'Konfirmasi password tidak cocok.',
-        ]);
+{
+    $validator = Validator::make($request->all(), [
+        'name' => 'required',
+        'email' => 'required|email|unique:accounts,email',
+        'password' => 'required|confirmed|min:6',
+    ], [
+        'email.unique' => 'Akun sudah digunakan!',
+        'email.email' => 'Format email tidak valid.',
+        'password.confirmed' => 'Konfirmasi password tidak cocok.',
+    ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => 'error',
-                'messages' => $validator->errors()->all()
-            ], 422);
-        }
-
-        DB::table('accounts')->insert([
-            'name' => $request->name,
-            'email' => $request->email,
-            'role' => 'user',
-            'password' => bcrypt($request->password)
-        ]);
-
+    if ($validator->fails()) {
         return response()->json([
-            'status' => 'success',
-            'message' => 'You Have Created Your Account!'
-        ]);
+            'status' => 'error',
+            'messages' => $validator->errors()->all()
+        ], 422);
     }
+
+    DB::table('accounts')->insert([
+        'name' => $request->name,
+        'email' => $request->email,
+        'role' => 'user',
+        'password' => bcrypt($request->password),
+    ]);
+
+    return response()->json([
+        'status' => 'success',
+        'message' => 'You Have Created Your Account!'
+    ]);
+}
+
 
     public function edit(Account $account)
     {

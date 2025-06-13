@@ -14,6 +14,8 @@
   <!-- SweetAlert2 -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+
   <style>
     .form-step {
       display: none;
@@ -96,7 +98,7 @@
     </form>
   </div>
 
-  <script>
+  {{-- <script>
     document.addEventListener("DOMContentLoaded", function () {
       const nextBtn = document.querySelector('.btn-next');
       const backBtn = document.querySelector('.btn-back');
@@ -196,7 +198,103 @@
           });
       });
     });
-  </script>
+  </script> --}}
+
+  <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const nextBtn = document.querySelector('.btn-next');
+    const backBtn = document.querySelector('.btn-back');
+    const formSteps = document.querySelectorAll('.form-step');
+    const form = document.getElementById('registerForm');
+    let currentStep = 0;
+
+    // Next button click
+    nextBtn.addEventListener('click', () => {
+      const step1Inputs = formSteps[0].querySelectorAll('input[required]');
+      let valid = true;
+      step1Inputs.forEach(input => {
+        if (!input.value.trim()) {
+          valid = false;
+          input.style.borderColor = 'red';
+        } else {
+          input.style.borderColor = '';
+        }
+      });
+      if (!valid) return;
+
+      formSteps[currentStep].classList.remove('form-step-active');
+      currentStep++;
+      formSteps[currentStep].classList.add('form-step-active');
+      const fullNameInput = formSteps[currentStep].querySelector('input[name="full_name"]');
+      if (fullNameInput) {
+        fullNameInput.focus();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
+
+    // Back button click
+    backBtn.addEventListener('click', () => {
+      formSteps[currentStep].classList.remove('form-step-active');
+      currentStep--;
+      formSteps[currentStep].classList.add('form-step-active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // Submit form
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+
+      const formData = new FormData(form);
+
+      fetch("/account", {
+        method: "POST",
+        headers: {
+          'Accept': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: formData
+      })
+      .then(async response => {
+        const data = await response.json();
+
+        if (response.ok) {
+          Swal.fire({
+            title: "Success!",
+            text: data.message,
+            icon: "success",
+            confirmButtonText: "OK",
+          }).then(() => {
+            window.location.href = "/login-page";
+          });
+        } else if (response.status === 422) {
+          Swal.fire({
+            title: "Validation Error!",
+            html: data.messages.map(msg => `<p>${msg}</p>`).join(''),
+            icon: "error",
+            confirmButtonText: "OK",
+          });
+        } else {
+          Swal.fire({
+            title: "Error!",
+            text: "Unexpected server error",
+            icon: "error",
+            confirmButtonText: "OK",
+          });
+        }
+      })
+      .catch(error => {
+        console.error(error);
+        Swal.fire({
+          title: "Error!",
+          text: "Something went wrong!",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
+      });
+    });
+  });
+</script>
+
 </body>
 
 </html>

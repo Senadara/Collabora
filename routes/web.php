@@ -18,6 +18,25 @@ use App\Http\Controllers\{
 
 use App\Models\Event;
 
+Route::get('/copy-assets', function () {
+    $sourcePath = '/home/senadara/repositories/Collabora/public';
+    $targetPath = '/home/senadara/public_html/collabora.senadara.my.id';
+    $foldersToCopy = ['img', 'css'];
+    foreach ($foldersToCopy as $folder) {
+        $source = $sourcePath . '/' . $folder;
+        $target = $targetPath . '/' . $folder;
+        
+        // Hapus isi folder target jika ada
+        if (File::exists($target)) {
+            File::deleteDirectory($target);
+        }
+        
+        // Copy folder dari source ke target
+        File::copyDirectory($source, $target);
+    }
+    return "Folder img dan css berhasil di-copy ke $targetPath";
+});
+
 // -------------------- GUEST --------------------
 Route::middleware('guest')->group(function () {
     // Landing & Dashboard
@@ -104,6 +123,12 @@ Route::get('/admin/manage-account', [AccountController::class, 'manage'])->name(
 
 
 //Route::get('/admin/manage-account/{account}', [AccountController::class, 'destroy'])->name('account.destroy');
+
+// -------------------- REWARDING -------------------- //edit eventregistcontroller atau tambah controller baru
+Route::get('/rewarding', [EventController::class, 'rewarding'])->name('rewarding');
+Route::post('/rewarding', [EventController::class, 'store']);
+Route::get('/rewarding/show/{id}', [EventController::class, 'show']);
+Route::get('/search', [EventController::class, 'search'])->name('event.search');
 
 // -------------------- REWARD --------------------
 
