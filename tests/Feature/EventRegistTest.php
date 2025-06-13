@@ -23,7 +23,8 @@ class EventRegistTest extends TestCase
                 'phone' => '08123456789',
                 'experience' => 'Experienced',
             ])
-            ->assertStatus(403)
+            ->assertStatus(200) // akan fail karena menyatakan fail tidak ok
+            // ->assertStatus(403)
             ->assertJson([
                 'status' => 'error',
                 'message' => 'Anda tidak dapat mendaftar sebagai volunteer untuk event yang Anda buat sendiri.',
@@ -72,11 +73,12 @@ class EventRegistTest extends TestCase
                 'experience' => '',
                 'cv' => "",
             ])
-            ->assertFalse(422) // validasi gagal dengan JSON response
-            ->assertJsonValidationErrors(['phone', 'experience']);
+            ->assertStatus(200) // akan fail karena menyatakan fail tidak ok
+            // ->assertStatus(422) // validasi gagal dengan JSON response
+            ->assertJson(['phone', 'experience']);
     }
 
-    public function test_user_can_register_with_same_number()
+    public function test_user_can_register_with_same_number() // bug
     {
         Storage::fake('public');
 
@@ -92,17 +94,33 @@ class EventRegistTest extends TestCase
                 'experience' => 'Fresh graduate',
                 'cv' => $cv,
             ])
-            ->assertStatus(200)
+            ->assertStatus(200) // akan fail karena menyatakan fail tidak ok
             ->assertJson([
-                'status' => 'success',
-                'message' => 'You have successfully registered for the event.',
+                'status' => 'error',
+                'message' => 'Nomer anda sudah digunakan oleh pendaftar volunteer lain.',
             ]);
+    }
 
-        $this->assertDatabaseHas('event_regist', [
-            'account_id' => $account->id,
-            'event_id' => $event->id,
-            'status' => 'request',
-            'reward' => 'false',
-        ]);
+    public function test_user_can_register_to_other_event_with_Alphabet_Contact() // bug
+    {
+        Storage::fake('public');
+
+        $account = Account::factory()->create();
+        $eventOwner = Account::factory()->create();
+        $event = Event::factory()->create(['account_id' => $eventOwner->id]);
+
+        $cv = UploadedFile::fake()->create('cv.pdf', 100, 'application/pdf');
+
+        $this->withSession(['account' => $account])
+            ->postJson(route('regist.event', ['event' => $event->id]), [
+                'phone' => 'test',
+                'experience' => 'test nomer dengan huruf',
+                'cv' => $cv,
+            ])
+            ->assertStatus(200) // akan fail karena menyatakan fail tidak ok
+            ->assertJson([
+                'status' => 'error',
+                'message' => 'Pastikan nomor telepon Anda valid.',
+            ]);
     }
 }
