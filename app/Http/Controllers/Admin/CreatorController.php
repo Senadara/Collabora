@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Admin;
 
 use App\Models\User;
@@ -14,7 +15,7 @@ class CreatorController extends Controller
     {
         $user = Auth::user()->user;
         if ($user->creator_status === 'pending') {
-            return back()->with('info', 'Pengajuan Anda sedang diproses.');
+            return view('page.event-creator-regis', ['info' => 'Pengajuan Anda sedang diproses.']);
         }
 
         return view('page.event-creator-regis');

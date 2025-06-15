@@ -13,7 +13,8 @@ use App\Http\Controllers\{
     SessionController,
     RatingController,
     ResetPasswordController,
-    RewardController
+    RewardController,
+    BiodataController
 };
 
 use App\Models\Event;
@@ -25,12 +26,12 @@ Route::get('/copy-assets', function () {
     foreach ($foldersToCopy as $folder) {
         $source = $sourcePath . '/' . $folder;
         $target = $targetPath . '/' . $folder;
-        
+
         // Hapus isi folder target jika ada
         if (File::exists($target)) {
             File::deleteDirectory($target);
         }
-        
+
         // Copy folder dari source ke target
         File::copyDirectory($source, $target);
     }
@@ -68,12 +69,25 @@ Route::middleware(['auth', 'role:user|event_creator|admin'])->group(function () 
     //Event-Creator
     Route::get('/event/show/{id}', [EventController::class, 'show']);
     Route::get('/search', [EventController::class, 'search'])->name('event.search');
+
+    // Route::get('/biodata', [BiodataController::class, 'create'])->middleware('auth');
+    // Route::post('/biodata/create', [BiodataController::class, 'store'])->middleware('auth');
+    // Route::post('/biodata/update', [BiodataController::class, 'update'])->middleware('auth');
+
+
+    // Tampilkan form biodata
+    Route::get('/biodata/create', [AccountController::class, 'createBiodataForm'])->name('biodata.form');
     Route::post('/biodata/create', [AccountController::class, 'createBiodata']);
-    Route::put('/biodata/update/{account_id}', [AccountController::class, 'updateBiodata']);
+    Route::post('/biodata/update', [AccountController::class, 'updateBiodata']);
+
+    // Route::put('/biodata/update/{account_id}', [AccountController::class, 'updateBiodata']);
+
+
     Route::get('/download-certificate', [RewardController::class, 'download'])->name('certificate.download');
     Route::get('/reward/{id}', [RewardController::class, 'reward']);
     Route::resource('/rating', RatingController::class);
     Route::get('/rating/{id}/show', [RatingController::class, 'showByEvent']);
+
     Route::get('/daftar-creator', [CreatorController::class, 'form'])->name('creator.form');
     Route::post('/daftar-creator', [CreatorController::class, 'register'])->name('creator.register');
 });
@@ -108,7 +122,6 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/creator-requests', [CreatorController::class, 'index'])->name('creator.requests');
     Route::post('/creator-approve/{id}', [CreatorController::class, 'approve'])->name('creator.approve');
     Route::post('/creator-reject/{id}', [CreatorController::class, 'reject'])->name('creator.reject');
-
 });
 
 // -------------------- EVENT REGISTRATION --------------------

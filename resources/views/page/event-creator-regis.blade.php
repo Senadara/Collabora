@@ -13,7 +13,7 @@
         <label>Upload Foto Selfie dengan KTP</label>
         <input type="file" name="selfie_photo" accept="image/*" required>
     </div>
+
     <button type="submit">Ajukan Sebagai Event Creator</button>
 </form>
 @endsection
-    

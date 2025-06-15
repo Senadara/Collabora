@@ -32,11 +32,11 @@
                             <a class="nav-link mx-lg-2" href="/event">Event</a>
                         </li>
                     @endif
-                    @if (auth()->user()->role == 'user')
+                    {{-- @if (auth()->user()->role == 'user')
                             <li class="nav-item">
                             <a class="nav-link mx-lg-2" href="/daftar-creator">Regis Event Creator</a>
                         </li>
-                    @endif
+                    @endif --}}
                     @if (auth()->user()->role == 'admin')
                             <li class="nav-item">
                             <a class="nav-link mx-lg-2" href="/creator-requests">Regis Event Creator</a>
@@ -50,7 +50,7 @@
                     @endif
                      @if (auth()->user()->role == 'user')
                         <li class="nav-item">
-                           <a class="nav-link mx-lg-2" href="#">Account</a>
+                           <a class="nav-link mx-lg-2" href="/biodata/create">Account</a>
                         </li>
                     @endif
                     @if (auth()->user()->role == 'admin')
