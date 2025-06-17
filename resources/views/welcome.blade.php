@@ -110,7 +110,8 @@
             <div class="card-content">
             <h3>Ayo, Jadi Relawan dan Berikan Dampak Positif!</h3>
             <p>Yuk daftarkan dirimu sekarang dan bergabung dengan komunitas kami!</p>
-            <button onclick="window.location.href='{{ url('/account') }}'">Daftar Sekarang</button>
+            <button onclick="window.location.href='/login-page'">Daftar Sekarang</button>
+
 
             </div>
         </div>
