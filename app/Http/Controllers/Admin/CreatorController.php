@@ -13,37 +13,46 @@ class CreatorController extends Controller
 {
     public function form()
     {
-        $user = Auth::user()->user;
-        if ($user->creator_status === 'pending') {
-            return view('page.event-creator-regis', ['info' => 'Pengajuan Anda sedang diproses.']);
-        }
+        $account = Auth::user();
+        $user = $account->user;
 
-        return view('page.event-creator-regis');
+        return view('page.event-creator-regis', [
+            'status' => $user->creator_request_status,
+            'user' => $user
+        ]);
     }
 
     public function register(Request $request)
     {
-        $request->validate([
-            'ktp_photo' => 'required|image|max:2048',
-            'selfie_photo' => 'required|image|max:2048',
-        ]);
-
         $account = Auth::user();
         $user = $account->user;
 
-        // Simpan file
-        $ktpPath = $request->file('ktp_photo')->store('ktp_photos', 'public');
-        $selfiePath = $request->file('selfie_photo')->store('selfie_photos', 'public');
+        if ($user->creator_request_status === 'approved') {
+            return redirect()->back()->with('error', 'Akun Anda sudah disetujui sebagai Event Creator.');
+        }
 
-        // Update data
-        $user->update([
-            'ktp_photo' => $ktpPath,
-            'selfie_photo' => $selfiePath,
-            'creator_status' => 'pending',
+        $request->validate([
+            'ktp_photo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'selfie_photo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        return redirect('/dashboard')->with('success', 'Pengajuan berhasil dikirim.');
+        try {
+            // Simpan file
+            $ktpPath = $request->file('ktp_photo')->store('ktp_photos', 'public');
+            $selfiePath = $request->file('selfie_photo')->store('selfie_photos', 'public');
+
+            // Update user
+            $user->ktp_photo = $ktpPath;
+            $user->selfie_photo = $selfiePath;
+            $user->creator_request_status = 'pending'; // reset status jika sebelumnya rejected
+            $user->save();
+
+            return redirect()->route('creator.form')->with('success', 'Pengajuan berhasil dikirim.');
+        } catch (\Exception $e) {
+            return redirect()->route('creator.form')->with('error', 'Terjadi kesalahan saat mengunggah. Silakan coba lagi.');
+        }
     }
+
 
     public function index()
     {

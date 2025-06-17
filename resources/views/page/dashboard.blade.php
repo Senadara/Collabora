@@ -40,37 +40,51 @@
                                 <h6 class="card-location">Location : {{ $event->location }}</h6>
                                 <br>
                                 <a href="/event/show/{{ $event->id }}" class="btn btn-custom-view">View More</a>
-                                <button class="btn btn-volunteer" data-bs-toggle="modal" data-bs-target="#modalEventRegist{{ $event->id }}">Volunteer</button>
+                                <button class="btn btn-volunteer" data-bs-toggle="modal"
+                                    data-bs-target="#modalEventRegist{{ $event->id }}">Volunteer</button>
                             </div>
                         </div>
                     </div>
 
                     <!-- Modal -->
-                    <div class="modal fade" id="modalEventRegist{{ $event->id }}" tabindex="-1" role="dialog" aria-labelledby="modalEventRegistLabel" aria-hidden="true">
+                    <div class="modal fade" id="modalEventRegist{{ $event->id }}" tabindex="-1" role="dialog"
+                        aria-labelledby="modalEventRegistLabel" aria-hidden="true">
                         <div class="modal-dialog" role="document">
-                            <form name="formEventRegist" action="{{ route('regist.event', ['event' => $event->id]) }}" method="post" enctype="multipart/form-data">
+                            <form name="formEventRegist" action="{{ route('regist.event', ['event' => $event->id]) }}"
+                                method="post" enctype="multipart/form-data">
                                 @csrf
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title">Registation Form</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
                                         <div class="mb-3">
                                             <label for="phone" class="form-label">Nomor Telepon</label>
-                                            <input type="text" class="form-control" name="phone" placeholder="Masukkan nomor telepon">
+                                            <input type="text" class="form-control" name="phone"
+                                                placeholder="Masukkan nomor telepon">
+                                            <div class="invalid-feedback"></div> <!-- untuk error -->
                                         </div>
+
                                         <div class="mb-3">
                                             <label for="experience" class="form-label">Pengalaman</label>
-                                            <input type="text" class="form-control" name="experience" placeholder="Masukkan pengalaman">
+                                            <input type="text" class="form-control" name="experience"
+                                                placeholder="Masukkan pengalaman">
+                                            <div class="invalid-feedback"></div>
                                         </div>
+
                                         <div class="mb-3">
                                             <label for="cv" class="form-label">Upload CV</label>
-                                            <input type="file" class="form-control" name="cv" accept=".pdf,.doc,.docx">
+                                            <input type="file" class="form-control" name="cv"
+                                                accept=".pdf,.doc,.docx">
+                                            <div class="invalid-feedback"></div>
                                         </div>
+
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Cancel</button>
                                         <button type="submit" class="btn btn-success">Register</button>
                                     </div>
                                 </div>
@@ -82,50 +96,83 @@
         </div>
     </div>
 @endsection
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.querySelectorAll('form[name="formEventRegist"]').forEach(form => {
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
 
-   @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    document.querySelectorAll('form[name="formEventRegist"]').forEach(form => {
-        form.addEventListener('submit', function (event) {
-            event.preventDefault();
+                fetch(form.action, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': form.querySelector('input[name="_token"]').value
+                        },
+                        body: new FormData(form),
+                    })
+                    .then(async response => {
+                        let data;
 
-            fetch(form.action, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': form.querySelector('input[name="_token"]').value
-                },
-                body: new FormData(form),
-            })
-            .then(async response => {
-                const data = await response.json(); // Ambil data meskipun status bukan 200
+                        try {
+                            data = await response.json();
+                        } catch (e) {
+                            throw new Error('Server tidak mengembalikan data JSON yang valid.');
+                        }
 
-                if (response.ok && data.status === 'success') {
-                    Swal.fire({
-                        title: 'Success!',
-                        text: data.message || 'You have successfully registered for the event.',
-                        icon: 'success',
-                        confirmButtonText: 'OK'
-                    }).then(() => window.location.href = "/dashboard");
-                } else {
-                    Swal.fire({
-                        title: 'Gagal!',
-                        text: data.message || 'Terjadi kesalahan saat mendaftar.',
-                        icon: 'error',
-                        confirmButtonText: 'OK'
+                        // Reset semua error field terlebih dahulu
+                        form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove(
+                            'is-invalid'));
+                        form.querySelectorAll('.invalid-feedback').forEach(el => el.innerText = '');
+
+                        if (response.ok && data.status === 'success') {
+                            Swal.fire({
+                                title: 'Success!',
+                                text: data.message ||
+                                    'You have successfully registered for the event.',
+                                icon: 'success',
+                                confirmButtonText: 'OK'
+                            }).then(() => window.location.href = "/dashboard");
+                        } else {
+                            if (data.errors) {
+                                for (const [field, messages] of Object.entries(data.errors)) {
+                                    const input = form.querySelector(`[name="${field}"]`);
+                                    const errorContainer = input?.parentElement.querySelector(
+                                        '.invalid-feedback');
+                                    if (input) {
+                                        input.classList.add('is-invalid');
+                                    }
+                                    if (errorContainer) {
+                                        errorContainer.innerText = messages[
+                                        0]; // tampilkan pesan pertama
+                                    }
+                                }
+
+                                Swal.fire({
+                                    title: 'Validasi Gagal!',
+                                    text: 'Silakan periksa kembali input Anda.',
+                                    icon: 'error',
+                                    confirmButtonText: 'OK'
+                                });
+                            } else {
+                                Swal.fire({
+                                    title: 'Gagal!',
+                                    text: data.message ||
+                                        'Terjadi kesalahan saat mendaftar.',
+                                    icon: 'error',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: error.message || 'Gagal menghubungi server.',
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
                     });
-                }
-            })
-            .catch(error => {
-                Swal.fire({
-                    title: 'Error!',
-                    text: error.message || 'Gagal menghubungi server.',
-                    icon: 'error',
-                    confirmButtonText: 'OK'
-                });
             });
         });
-    });
-</script>
+    </script>
 @endpush
-

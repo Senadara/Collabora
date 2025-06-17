@@ -21,5 +21,13 @@ class User extends Authenticatable
         'major',
         'semester',
         'instagram_handle',
+        'ktp_photo',
+        'selfie_photo',
+        'creator_status',
     ];
+
+    public function account()
+    {
+        return $this->belongsTo(Account::class, 'account_id');
+    }
 }

@@ -8,54 +8,65 @@ use App\Models\EventRegistModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class EventRegistController extends Controller
 {
-    public function addeventregist(Request $request, $event)
-    {
-        // Ambil ID user dari session
-        $userId = session('account')->id;
 
-        // Cari event berdasarkan ID
-        $eventData = Event::findOrFail($event);
+public function addeventregist(Request $request, $event)
+{
+    $userId = session('account')->id;
 
-        // Validasi: Cegah user mendaftarkan diri ke event yang dia buat sendiri
-        if ($eventData->account_id == $userId) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Anda tidak dapat mendaftar sebagai volunteer untuk event yang Anda buat sendiri.'
-            ], 403);
-        }
+    // Cari event
+    $eventData = Event::findOrFail($event);
 
-        // Validasi input
-        $this->validate($request, [
-            'phone' => 'required',
-            'experience' => 'required',
-            'cv' => 'nullable|mimes:pdf,doc,docx|max:2048',
-        ]);
-
-        // Upload CV kalau ada
-        $cvPath = null;
-        if ($request->hasFile('cv')) {
-            $cvPath = $request->file('cv')->store('CV', 'public');
-        }
-
-        // Simpan pendaftaran volunteer
-        EventRegistModel::create([
-            'account_id' => $userId,
-            'phone' => $request->phone,
-            'status' => 'request',
-            'reward' => 'false',
-            'experience' => $request->experience,
-            'event_id' => $event,
-            'cv_path' => $cvPath,
-        ]);
-
+    // Cegah user daftar ke event miliknya sendiri
+    if ($eventData->account_id == $userId) {
         return response()->json([
-            'status' => 'success',
-            'message' => 'You have successfully registered for the event.'
-        ]);
+            'status' => 'error',
+            'message' => 'Anda tidak dapat mendaftar sebagai volunteer untuk event yang Anda buat sendiri.'
+        ], 403);
     }
+
+    // Validasi manual untuk bisa return semua error sebagai JSON
+    $validator = Validator::make($request->all(), [
+        'phone' => 'required',
+        'experience' => 'required',
+        'cv' => 'required|mimes:pdf,doc,docx|max:2048',
+    ]);
+
+    // Jika validasi gagal, kirim JSON error field
+    if ($validator->fails()) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Validasi gagal',
+            'errors' => $validator->errors()  // akan berisi error per kolom
+        ], 422);
+    }
+
+    // Upload CV jika ada
+    $cvPath = null;
+    if ($request->hasFile('cv')) {
+        $cvPath = $request->file('cv')->store('CV', 'public');
+    }
+
+    // Simpan pendaftaran
+    EventRegistModel::create([
+        'account_id' => $userId,
+        'phone' => $request->phone,
+        'status' => 'request',
+        'reward' => 'false',
+        'experience' => $request->experience,
+        'event_id' => $event,
+        'cv_path' => $cvPath,
+    ]);
+
+    return response()->json([
+        'status' => 'success',
+        'message' => 'You have successfully registered for the event.'
+    ]);
+}
+
 
     public function index()
     {

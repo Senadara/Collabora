@@ -27,30 +27,25 @@
                     <li class="nav-item">
                         <a class="nav-link mx-lg-2" href="/dashboard">Dashboard</a>
                     </li>
-                    @if (auth()->user()->role == 'event-creator')
+                    @if (auth()->user()->role == 'event_creator')
                         <li class="nav-item">
                             <a class="nav-link mx-lg-2" href="/event">Event</a>
                         </li>
                     @endif
-                    {{-- @if (auth()->user()->role == 'user')
-                            <li class="nav-item">
-                            <a class="nav-link mx-lg-2" href="/daftar-creator">Regis Event Creator</a>
-                        </li>
-                    @endif --}}
                     @if (auth()->user()->role == 'admin')
                             <li class="nav-item">
                             <a class="nav-link mx-lg-2" href="/creator-requests">Regis Event Creator</a>
                         </li>
                     @endif
-                    @if (auth()->user()->role == 'user')
+                    @if (in_array(auth()->user()->role, ['user', 'event_creator']))
                         <li class="nav-item">
                             {{-- <a class="nav-link mx-lg-2" href="/#">Rewarding</a> --}}
                             <a class="nav-link mx-lg-2" href="/rewarding">Rewarding</a>
                         </li>
                     @endif
-                     @if (auth()->user()->role == 'user')
+                     @if (in_array(auth()->user()->role, ['user', 'event_creator']))
                         <li class="nav-item">
-                           <a class="nav-link mx-lg-2" href="/biodata/create">Account</a>
+                           <a class="nav-link mx-lg-2" href="/biodata">Account</a>
                         </li>
                     @endif
                     @if (auth()->user()->role == 'admin')
