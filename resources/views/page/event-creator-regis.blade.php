@@ -1,8 +1,9 @@
 @extends('layouts.main')
 
 @section('content')
+<br>
+<br>
     <div style="max-width:500px; margin:auto; padding:2rem; background:white; border-radius:8px;">
-
         <h2 style="text-align:center;">Daftar Creator</h2>
         @if (session('success'))
             <script>
@@ -53,18 +54,51 @@
         <form action="{{ route('creator.register') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
-            <div>
-                <label for="ktp_photo">Foto KTP:</label>
-                <input type="file" name="ktp_photo" accept="image/*" {{ $isApproved ? 'disabled' : 'required' }}>
+            <div class="form-group" style="margin-bottom:1.2rem;">
+                <label for="ktp_photo" style="font-weight:600; display:block; margin-bottom:0.5rem;">
+                    Foto KTP:
+                </label>
+                <input 
+                    type="file" 
+                    name="ktp_photo" 
+                    id="ktp_photo"
+                    accept="image/*" 
+                    class="form-control" 
+                    style="padding:0.5rem; border:1px solid #ced4da; border-radius:4px;"
+                    {{ $isApproved ? 'disabled' : 'required' }}>
             </div>
 
-            <div style="margin-top:1rem;">
-                <label for="selfie_photo">Foto Selfie dengan KTP:</label>
-                <input type="file" name="selfie_photo" accept="image/*" {{ $isApproved ? 'disabled' : 'required' }}>
+            <div class="form-group" style="margin-bottom:1.5rem;">
+                <label for="selfie_photo" style="font-weight:600; display:block; margin-bottom:0.5rem;">
+                    Foto Selfie dengan KTP:
+                </label>
+                <input 
+                    type="file" 
+                    name="selfie_photo" 
+                    id="selfie_photo"
+                    accept="image/*" 
+                    class="form-control" 
+                    style="padding:0.5rem; border:1px solid #ced4da; border-radius:4px;"
+                    {{ $isApproved ? 'disabled' : 'required' }}>
             </div>
 
-            <div style="margin-top:1.5rem;">
-                <button type="submit" {{ $isApproved ? 'disabled style=background:#ccc;cursor:not-allowed;' : '' }}>
+            <div style="margin-top:2rem; text-align:center;">
+               <button 
+                    type="submit"
+                    class="btn"
+                    style="
+                        padding:0.7rem 2.5rem;
+                        background:{{ $isApproved ? '#ccc' : 'rgba(15, 24, 37, 0.8)' }};
+                        color:white;
+                        border:none;
+                        border-radius:5px;
+                        font-size:1rem;
+                        font-weight:600;
+                        cursor:{{ $isApproved ? 'not-allowed' : 'pointer' }};
+                        transition:background 0.2s;
+                    "
+                    {{ $isApproved ? 'disabled' : '' }}
+                >
                     @if ($isRejected)
                         Ajukan Ulang
                     @elseif ($isPending)
