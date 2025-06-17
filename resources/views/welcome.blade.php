@@ -90,7 +90,7 @@
                     <img src="{{ asset($event->event_image) }}" alt="{{ $event->name_event }}" class="card-img-top">
                     <div class="card-body">
                         <h3 class="card-title">{{ $event->name_event }}</h3>
-                        <a href="{{ url('/account') }}" class="btn btn-custom-view">Lihat Detail</a>
+                        <a href="{{ url('/login-page') }}" class="btn btn-custom-view">Lihat Detail</a>
                     </div>
                 </div>
             @endforeach
