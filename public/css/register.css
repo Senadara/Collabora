@@ -11,7 +11,7 @@ body {
     justify-content: center;
     align-items: flex-start; /* ubah dari center ke flex-start supaya konten mulai dari atas */
     min-height: 100vh;
-    background-color: bisque;
+    background-image: url('../img/potret2.jpg');
     background-size: cover;
     background-position: center;
     overflow-y: auto; /* biar bisa scroll vertikal */

@@ -79,6 +79,8 @@ Route::middleware(['auth', 'role:user|event_creator|admin'])->group(function () 
     Route::get('/biodata/create', [AccountController::class, 'createBiodataForm'])->name('biodata.form');
     Route::post('/biodata/create', [AccountController::class, 'createBiodata']);
     Route::post('/biodata/update', [AccountController::class, 'updateBiodata']);
+    Route::post('/biodata', [BiodataController::class, 'store'])->name('biodata.store');
+
 
     // Route::put('/biodata/update/{account_id}', [AccountController::class, 'updateBiodata']);
 
