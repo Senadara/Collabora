@@ -23,7 +23,7 @@ return [
                 : storage_path('app/public/sponsor'),
         ],
         'ktp' => [
-            'db_path' => '/storage/ktp_photos',
+            'db_path' => 'ktp_photos',
             'url_path' => $isProduction
                 ? '/collabora.senadara.my.id/storage/ktp_photos'
                 : 'storage/ktp_photos',
@@ -32,7 +32,7 @@ return [
                 : storage_path('app/public/ktp_photos'),
         ],        
         'selfie' => [
-            'db_path' => '/storage/selfie_photos',
+            'db_path' => 'selfie_photos',
             'url_path' => $isProduction
                 ? '/collabora.senadara.my.id/storage/selfie_photos'
                 : 'storage/selfie_photos',
