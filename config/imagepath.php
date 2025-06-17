@@ -22,6 +22,24 @@ return [
                 ? '/home/senadara/public_html/collabora.senadara.my.id/storage/sponsor'
                 : storage_path('app/public/sponsor'),
         ],
+        'ktp' => [
+            'db_path' => '/storage/ktp_photos',
+            'url_path' => $isProduction
+                ? '/collabora.senadara.my.id/storage/ktp_photos'
+                : 'storage/ktp_photos',
+            'storage_path' => $isProduction
+                ? '/home/senadara/public_html/collabora.senadara.my.id/storage/ktp_photos'
+                : storage_path('app/public/ktp_photos'),
+        ],        
+        'selfie' => [
+            'db_path' => '/storage/selfie_photos',
+            'url_path' => $isProduction
+                ? '/collabora.senadara.my.id/storage/selfie_photos'
+                : 'storage/selfie_photos',
+            'storage_path' => $isProduction
+                ? '/home/senadara/public_html/collabora.senadara.my.id/storage/selfie_photos'
+                : storage_path('app/public/selfie_photos'),
+        ],
         // Tambahkan lainnya sesuai kebutuhan
     ]
 ];

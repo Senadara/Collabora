@@ -41,6 +41,27 @@ class CreatorController extends Controller
             $ktpPath = $request->file('ktp_photo')->store('ktp_photos', 'public');
             $selfiePath = $request->file('selfie_photo')->store('selfie_photos', 'public');
 
+            foreach (['ktp_photo' => 'ktp', 'selfie_photo' => 'selfie'] as $inputName => $folder) {
+                if ($request->hasFile($inputName)) {
+                    $file = $request->file($inputName);
+                    $filename = time() . '_' . $file->getClientOriginalName();
+
+                    $storagePath = config("imagepath.folders.$folder.storage_path");
+                    $urlPath = config("imagepath.folders.$folder.url_path");
+
+                    if (!file_exists($storagePath)) {
+                        mkdir($storagePath, 0777, true);
+                    }
+
+                    $file->move($storagePath, $filename);
+
+                    // Simpan ke variabel sesuai field input (misal: $ktpPath, $selfiePath)
+                    ${$inputName . 'Path'} = config("imagepath.folders.$folder.db_path") . '/' . $filename;
+                }
+            }
+
+
+
             // Update user
             $user->ktp_photo = $ktpPath;
             $user->selfie_photo = $selfiePath;
