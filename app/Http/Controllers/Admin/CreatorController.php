@@ -38,8 +38,8 @@ class CreatorController extends Controller
 
         try {
             // Simpan file
-            $ktpPath = $request->file('ktp_photo')->store('ktp_photos', 'public');
-            $selfiePath = $request->file('selfie_photo')->store('selfie_photos', 'public');
+            $ktpPath = null;
+            $selfiePath = null;
 
             foreach (['ktp_photo' => 'ktp', 'selfie_photo' => 'selfie'] as $inputName => $folder) {
                 if ($request->hasFile($inputName)) {
@@ -47,7 +47,6 @@ class CreatorController extends Controller
                     $filename = time() . '_' . $file->getClientOriginalName();
 
                     $storagePath = config("imagepath.folders.$folder.storage_path");
-                    $urlPath = config("imagepath.folders.$folder.url_path");
 
                     if (!file_exists($storagePath)) {
                         mkdir($storagePath, 0777, true);
@@ -55,14 +54,18 @@ class CreatorController extends Controller
 
                     $file->move($storagePath, $filename);
 
-                    // Simpan ke variabel sesuai field input (misal: $ktpPath, $selfiePath)
-                    ${$inputName . 'Path'} = config("imagepath.folders.$folder.db_path") . '/' . $filename;
+                    // Set path ke variabel yang tepat
+                    $dbPath = config("imagepath.folders.$folder.db_path") . '/' . $filename;
+
+                    if ($inputName === 'ktp_photo') {
+                        $ktpPath = $dbPath;
+                    } elseif ($inputName === 'selfie_photo') {
+                        $selfiePath = $dbPath;
+                    }
                 }
             }
 
-
-
-            // Update user
+            // Update ke database
             $user->ktp_photo = $ktpPath;
             $user->selfie_photo = $selfiePath;
             $user->creator_request_status = 'pending'; // reset status jika sebelumnya rejected
