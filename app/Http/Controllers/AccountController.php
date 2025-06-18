@@ -13,7 +13,10 @@ use Illuminate\Support\Facades\Log;
 class AccountController extends Controller
 {
 
-    function index() {}
+    function index() {
+        $account = Account::all();
+        return view('/admin/manage-account', ['accountList' => $account]);
+    }
 
     function manage()
     {

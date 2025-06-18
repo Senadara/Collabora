@@ -6,7 +6,7 @@
     <br>
     <br>
    <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Manage Event</h1>
+    <h1>Manage My Event</h1>
     <a href="event/create" class="btn btn-dark">Create Data</a>
 </div>
 
