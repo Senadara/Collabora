@@ -103,71 +103,72 @@
             form.addEventListener('submit', function(event) {
                 event.preventDefault();
 
+                // Bersihkan error sebelumnya
+                form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+                form.querySelectorAll('.invalid-feedback').forEach(el => el.innerText = '');
+
+                const formData = new FormData(form);
+
                 fetch(form.action, {
                         method: 'POST',
                         headers: {
                             'X-CSRF-TOKEN': form.querySelector('input[name="_token"]').value
                         },
-                        body: new FormData(form),
+                        body: formData
                     })
                     .then(async response => {
                         let data;
-
                         try {
                             data = await response.json();
-                        } catch (e) {
-                            throw new Error('Server tidak mengembalikan data JSON yang valid.');
+                        } catch (error) {
+                            throw new Error('Response bukan JSON valid');
                         }
-
-                        // Reset semua error field terlebih dahulu
-                        form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove(
-                            'is-invalid'));
-                        form.querySelectorAll('.invalid-feedback').forEach(el => el.innerText = '');
 
                         if (response.ok && data.status === 'success') {
                             Swal.fire({
-                                title: 'Success!',
+                                title: 'Berhasil!',
                                 text: data.message ||
-                                    'You have successfully registered for the event.',
+                                    'Anda berhasil mendaftar sebagai volunteer.',
                                 icon: 'success',
                                 confirmButtonText: 'OK'
-                            }).then(() => window.location.href = "/dashboard");
-                        } else {
-                            if (data.errors) {
-                                for (const [field, messages] of Object.entries(data.errors)) {
-                                    const input = form.querySelector(`[name="${field}"]`);
-                                    const errorContainer = input?.parentElement.querySelector(
-                                        '.invalid-feedback');
-                                    if (input) {
-                                        input.classList.add('is-invalid');
-                                    }
-                                    if (errorContainer) {
-                                        errorContainer.innerText = messages[
-                                        0]; // tampilkan pesan pertama
-                                    }
+                            }).then(() => {
+                                window.location.href = "/dashboard";
+                            });
+                        } else if (data.status === 'error' && data.errors) {
+                            for (const [field, messages] of Object.entries(data.errors)) {
+                                const input = form.querySelector(`[name="${field}"]`);
+                                const feedback = input?.closest('.mb-3')?.querySelector(
+                                    '.invalid-feedback');
+
+                                if (input) {
+                                    input.classList.add('is-invalid');
                                 }
 
-                                Swal.fire({
-                                    title: 'Validasi Gagal!',
-                                    text: 'Silakan periksa kembali input Anda.',
-                                    icon: 'error',
-                                    confirmButtonText: 'OK'
-                                });
-                            } else {
-                                Swal.fire({
-                                    title: 'Gagal!',
-                                    text: data.message ||
-                                        'Terjadi kesalahan saat mendaftar.',
-                                    icon: 'error',
-                                    confirmButtonText: 'OK'
-                                });
+                                if (feedback) {
+                                    feedback.innerText = messages[
+                                    0]; // Tampilkan pesan error pertama
+                                }
                             }
+
+                            Swal.fire({
+                                title: 'Validasi Gagal!',
+                                text: 'Silakan periksa kembali input Anda.',
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Gagal!',
+                                text: data.message || 'Terjadi kesalahan saat mendaftar.',
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
                         }
                     })
                     .catch(error => {
                         Swal.fire({
                             title: 'Error!',
-                            text: error.message || 'Gagal menghubungi server.',
+                            text: error.message || 'Terjadi kesalahan jaringan.',
                             icon: 'error',
                             confirmButtonText: 'OK'
                         });

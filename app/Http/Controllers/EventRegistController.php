@@ -14,78 +14,62 @@ use Illuminate\Validation\Rule;
 class EventRegistController extends Controller
 {
 
-    public function addeventregist(Request $request, $event)
+    public function addeventregist(Request $request, $eventId)
     {
-        $userId = session('account')->id;
+        $user = session('account');
 
-        // Cari event
-        $eventData = Event::findOrFail($event);
+        $event = Event::findOrFail($eventId);
 
-        // Cegah user daftar ke event miliknya sendiri
-        if ($eventData->account_id == $userId) {
+        // Cegah daftar ke event sendiri
+        if ($event->account_id == $user->id) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Anda tidak dapat mendaftar sebagai volunteer untuk event yang Anda buat sendiri.'
+                'message' => 'Tidak bisa mendaftar ke event milik sendiri.'
             ], 403);
         }
 
-        // Validasi manual untuk bisa return semua error sebagai JSON
-        $validator = Validator::make($request->all(), [
-            'phone' => 'required',
-            'experience' => 'required',
-            'cv' => 'required|mimes:pdf,doc,docx|max:2048',
-        ]);
-
-        // Cek apakah user sudah pernah daftar ke event ini
-        $existing = EventRegistModel::where('account_id', $userId)
-            ->where('event_id', $event)
-            ->first();
-
-        if ($existing) {
+        // Cegah daftar ulang
+        if (EventRegistModel::where('account_id', $user->id)->where('event_id', $eventId)->exists()) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Anda sudah mendaftar sebagai volunteer di event ini.'
+                'message' => 'Anda sudah mendaftar sebagai volunteer.'
             ], 409);
         }
 
-        // Validasi manual dengan rule tambahan
+        // Validasi
         $validator = Validator::make($request->all(), [
-            'phone' => [
-                'required',
-                'regex:/^(\+62|62|0)[0-9]{9,13}$/',
-                Rule::unique('event_regists', 'phone'),
-            ],
+            'phone' => 'required|regex:/^(\+62|62|0)[0-9]{9,13}$/',
             'experience' => 'required|string',
-            'cv' => 'nullable|mimes:pdf,doc,docx|max:2048',
+            'cv' => 'required|file|mimes:pdf,doc,docx|max:2048',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'status' => 'error',
-                'errors' => $validator->errors(),
+                'errors' => $validator->errors()
             ], 422);
         }
 
-        // Upload CV jika ada
+        // Upload file
         $cvPath = null;
         if ($request->hasFile('cv')) {
-            $cvPath = $request->file('cv')->store('CV', 'public');
+            $filename = time() . '_' . $request->file('cv')->getClientOriginalName();
+            $cvPath = 'uploads/cv/' . $filename;
+            $request->file('cv')->move(public_path('uploads/cv'), $filename);
         }
 
         // Simpan pendaftaran
         EventRegistModel::create([
-            'account_id' => $userId,
+            'event_id' => $eventId,
+            'account_id' => $user->id,
             'phone' => $request->phone,
-            'status' => 'request',
-            'reward' => 'false',
             'experience' => $request->experience,
-            'event_id' => $event,
-            'cv_path' => $cvPath,
+            'cv' => $cvPath,
         ]);
 
         return response()->json([
             'status' => 'success',
-            'message' => 'You have successfully registered for the event.'
+            'message' => 'Pendaftaran volunteer berhasil.'
         ]);
     }
 

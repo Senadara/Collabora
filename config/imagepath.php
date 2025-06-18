@@ -30,7 +30,7 @@ return [
             'storage_path' => $isProduction
                 ? '/home/senadara/public_html/collabora.senadara.my.id/storage/ktp_photos'
                 : storage_path('app/public/ktp_photos'),
-        ],        
+        ],
         'selfie' => [
             'db_path' => 'selfie_photos',
             'url_path' => $isProduction
@@ -39,6 +39,15 @@ return [
             'storage_path' => $isProduction
                 ? '/home/senadara/public_html/collabora.senadara.my.id/storage/selfie_photos'
                 : storage_path('app/public/selfie_photos'),
+        ],
+        'cv' => [
+            'db_path' => 'CV',
+            'url_path' => env('APP_ENV') === 'production'
+                ? '/collabora.senadara.my.id/storage/CV'
+                : 'storage/CV',
+            'storage_path' => env('APP_ENV') === 'production'
+                ? '/home/senadara/public_html/collabora.senadara.my.id/storage/CV'
+                : storage_path('app/public/CV'),
         ],
         // Tambahkan lainnya sesuai kebutuhan
     ]
