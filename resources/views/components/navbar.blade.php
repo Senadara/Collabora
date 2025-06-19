@@ -45,7 +45,8 @@
                     @endif
                      @if (in_array(auth()->user()->role, ['user', 'event_creator']))
                         <li class="nav-item">
-                           <a class="nav-link mx-lg-2" href="/biodata">Account</a>
+                           {{-- <a class="nav-link mx-lg-2" href="/biodata">Account</a>  (eca)--}}
+                           <a class="nav-link mx-lg-2" href="/biodata">Biodata</a>
                         </li>
                     @endif
                     @if (auth()->user()->role == 'admin')
