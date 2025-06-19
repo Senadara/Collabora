@@ -31,9 +31,9 @@
 
             <br>
 
-            {{-- Trigger to reopen modal on validation error --}}
-            @if ($errors->any())
-                <input type="hidden" id="openModalId" value="{{ old('event_id') }}">
+            {{-- Hidden trigger untuk reopen modal bila ada error atau session event_id --}}
+            @if ($errors->any() || session('event_id'))
+                <input type="hidden" id="openModalId" value="{{ session('event_id') ?? old('event_id') }}">
             @endif
 
             <div class="card-wrapper">
@@ -53,32 +53,34 @@
                     </div>
 
                     <!-- Modal -->
-                    <div class="modal fade" id="modalEventRegist{{ $event->id }}" tabindex="-1" role="dialog"
-                        aria-labelledby="modalEventRegistLabel" aria-hidden="true">
-                        <div class="modal-dialog" role="document">
-                            <form name="formEventRegist" action="{{ route('regist.event', ['event' => $event->id]) }}"
-                                method="post" enctype="multipart/form-data">
+                    <div class="modal fade" id="modalEventRegist{{ $event->id }}" tabindex="-1"
+                        aria-labelledby="modalEventRegistLabel{{ $event->id }}" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <form action="{{ route('regist.event', $event->id) }}" method="post"
+                                enctype="multipart/form-data">
                                 @csrf
                                 <input type="hidden" name="event_id" value="{{ $event->id }}">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title">Registration Form</h5>
+                                        <h5 class="modal-title" id="modalEventRegistLabel{{ $event->id }}">
+                                            Registration Form
+                                        </h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal"
                                             aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
+                                        {{-- Phone --}}
                                         <div class="mb-3">
-                                            <label for="phone" class="form-label">Nomor Telepon</label>
+                                            <label class="form-label">Nomor Telepon</label>
                                             <input type="text" class="form-control @error('phone') is-invalid @enderror"
-                                                name="phone" value="{{ old('phone') }}"
-                                                placeholder="Masukkan nomor telepon">
+                                                name="phone" value="{{ old('phone') }}" placeholder="08xxxxxxxxxx">
                                             @error('phone')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
-
+                                        {{-- Experience --}}
                                         <div class="mb-3">
-                                            <label for="experience" class="form-label">Pengalaman</label>
+                                            <label class="form-label">Pengalaman</label>
                                             <input type="text"
                                                 class="form-control @error('experience') is-invalid @enderror"
                                                 name="experience" value="{{ old('experience') }}"
@@ -87,9 +89,9 @@
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
-
+                                        {{-- CV --}}
                                         <div class="mb-3">
-                                            <label for="cv" class="form-label">Upload CV</label>
+                                            <label class="form-label">Upload CV</label>
                                             <input type="file" class="form-control @error('cv') is-invalid @enderror"
                                                 name="cv" accept=".pdf,.doc,.docx">
                                             @error('cv')
@@ -112,23 +114,25 @@
     </div>
 @endsection
 
-
 @push('scripts')
-    {{-- SweetAlert2 --}}
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    {{-- Reopen modal jika error validasi --}}
+    <!-- Reopen modal jika ada event_id di session atau old -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const modalId = document.getElementById('openModalId')?.value;
             if (modalId) {
-                const selector = '#modalEventRegist' + modalId;
-                new bootstrap.Modal(document.querySelector(selector)).show();
+                new bootstrap.Modal(
+                    document.getElementById('modalEventRegist' + modalId)
+                ).show();
             }
         });
     </script>
 
-    {{-- Tampilkan SweetAlert berdasarkan session --}}
+    <!-- SweetAlert untuk sukses / error -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             @if (session('swal_success'))

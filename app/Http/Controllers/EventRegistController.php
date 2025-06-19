@@ -41,6 +41,18 @@ class EventRegistController extends Controller
             'cv.max' => 'Ukuran file maksimal 2MB.',
         ]);
 
+        // 3. Cek duplikasi nomor telepon pada event yang sama
+        $phone = $request->phone;
+        if (EventRegistModel::where('phone', $phone)
+            ->where('event_id', $event)
+            ->exists()
+        ) {
+            return back()
+                ->withInput()
+                ->with('swal_error', 'Nomor telepon ini sudah terdaftar untuk event ini.')
+                ->with('event_id', $event);
+        }
+
         if ($validator->fails()) {
             return back()
                 ->withErrors($validator)
