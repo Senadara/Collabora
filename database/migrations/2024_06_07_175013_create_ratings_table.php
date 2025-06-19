@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('ratings', function (Blueprint $table) {
             $table->id();
             $table->string('star');
-            $table->text('feedback')->nullable(go);
+            $table->text('feedback')->nullable();
             $table->unsignedBigInteger('account_id')->nullable();
             $table->foreign('account_id')->references('id')->on('accounts')->onDelete('cascade');
             $table->unsignedBigInteger('event_id')->nullable();
