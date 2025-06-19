@@ -13,7 +13,8 @@ use Illuminate\Support\Facades\Log;
 class AccountController extends Controller
 {
 
-    function index() {
+    function index()
+    {
         $account = Account::all();
         return view('/admin/manage-account', ['accountList' => $account]);
     }
@@ -80,21 +81,26 @@ class AccountController extends Controller
 
     public function update(Request $request, Account $account)
     {
-
         $validateData = $request->validate([
-            'name' => 'required',
-            'email' => 'required|email',
-            'password' => 'required'
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:accounts,email,' . $account->id,
+            'password' => 'nullable|min:6'
         ]);
-        // dd($validateData);
+
         $account->name = $validateData['name'];
         $account->email = $validateData['email'];
-        $account->password = bcrypt($validateData['password']);
 
+        if (!empty($validateData['password'])) {
+            $account->password = bcrypt($validateData['password']);
+        }
 
         $account->save();
-        return redirect()->route('manage');
+
+        return redirect()
+            ->back()
+            ->with('success', 'Account berhasil diperbarui!');
     }
+
 
     public function destroy(Account $account)
     {

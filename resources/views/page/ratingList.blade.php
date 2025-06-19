@@ -21,7 +21,7 @@
                     // dd($acc);
                 @endphp --}}
                     <tr>
-                        <td>{{ $item->account_id }}</td>
+                        <td>{{ $item->account->name }}</td>
                         <td>{{ $item->feedback }}</td>
                         <td>{{ $item->star }}</td>
                         <td>

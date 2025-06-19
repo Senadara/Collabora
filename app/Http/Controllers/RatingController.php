@@ -16,15 +16,19 @@ class RatingController extends Controller
 
     public function showByEvent($id)
     {
-        $ratings = Rating::where('event_id', $id)->get();
-        return view('page.ratingList', ['ratings' => $ratings]);
+        $ratings = Rating::with('account') // ambil relasi akun
+            ->where('event_id', $id)
+            ->get();
+
+        return view('page.ratingList', compact('ratings'));
     }
+
 
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'event_id' => 'required|integer|exists:event,id',
-            'feedback' => 'required|string|max:255',
+            'feedback' => 'nullable|string|max:255',
             'star' => 'required|integer|min:1|max:5',
         ]);
 

@@ -18,6 +18,15 @@ class Rating extends Model
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        'star', 'feedback', 'account_id', 'event_id'
+        'star',
+        'feedback',
+        'account_id',
+        'event_id'
     ];
+
+    // app/Models/Rating.php
+    public function account()
+    {
+        return $this->belongsTo(Account::class, 'account_id');
+    }
 }
