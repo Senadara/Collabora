@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Models\EventRegistModel;
 use App\Models\Rating;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -26,12 +27,27 @@ class EventController extends Controller
     }
 
     // eca
-    public function rewarding()
+    public function rewarding(Request $request)
     {
-        $events = Event::where('account_id', session('account')->id)->get();
+        // ambil akun yang sedang login (bisa juga pakai auth()->id())
+        $accountId = session('account')->id;
 
-        return view('page/rewarding', [
-            'eventList' => $events
+        // 1. Semua pendaftaran yang sudah "accepted"
+        $participations = EventRegistModel::with('event')
+            ->where('account_id', $accountId)
+            ->where('status', 'accepted')
+            ->get();
+
+        // 2. Filter yang sudah reward = true
+        $rewarded = $participations->filter(function ($reg) {
+            return (bool) $reg->reward;
+        });
+
+        return view('page.rewarding', [
+            // koleksi pendaftaran lengkap (accepted)
+            'participations' => $participations,
+            // subset yang sudah reward
+            'rewarded'       => $rewarded,
         ]);
     }
 
@@ -109,53 +125,53 @@ class EventController extends Controller
 
     // eca
     public function store(Request $request)
-{
-    $account = session('account');
-    if (!$account) {
-        return redirect('/login-page')->withErrors('Silakan login terlebih dahulu.');
-    }
-
-    $validatedData = $request->validate([
-        'name_event' => 'required|string|max:255',
-        'location' => 'required|string|max:255',
-        'date' => ['required', 'date', 'after_or_equal:today'],
-        'description_event' => 'required|string',
-        'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-    ], [
-        'date.after_or_equal' => 'Tanggal event tidak boleh di masa lalu.',
-        'image.image' => 'File harus berupa gambar.',
-        'image.mimes' => 'Format gambar tidak didukung.',
-    ]);
-
-    $filePath = null;
-
-    if ($request->hasFile('image')) {
-        $folder = 'event';
-        $file = $request->file('image');
-        $filename = time() . '_' . $file->getClientOriginalName();
-
-        $storagePath = config("imagepath.folders.$folder.storage_path");
-        $urlPath = config("imagepath.folders.$folder.url_path");
-
-        if (!file_exists($storagePath)) {
-            mkdir($storagePath, 0777, true);
+    {
+        $account = session('account');
+        if (!$account) {
+            return redirect('/login-page')->withErrors('Silakan login terlebih dahulu.');
         }
 
-        $file->move($storagePath, $filename);
-        $filePath = config("imagepath.folders.$folder.db_path") . '/' . $filename;
+        $validatedData = $request->validate([
+            'name_event' => 'required|string|max:255',
+            'location' => 'required|string|max:255',
+            'date' => ['required', 'date', 'after_or_equal:today'],
+            'description_event' => 'required|string',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ], [
+            'date.after_or_equal' => 'Tanggal event tidak boleh di masa lalu.',
+            'image.image' => 'File harus berupa gambar.',
+            'image.mimes' => 'Format gambar tidak didukung.',
+        ]);
+
+        $filePath = null;
+
+        if ($request->hasFile('image')) {
+            $folder = 'event';
+            $file = $request->file('image');
+            $filename = time() . '_' . $file->getClientOriginalName();
+
+            $storagePath = config("imagepath.folders.$folder.storage_path");
+            $urlPath = config("imagepath.folders.$folder.url_path");
+
+            if (!file_exists($storagePath)) {
+                mkdir($storagePath, 0777, true);
+            }
+
+            $file->move($storagePath, $filename);
+            $filePath = config("imagepath.folders.$folder.db_path") . '/' . $filename;
+        }
+
+        $event = new Event;
+        $event->name_event = $validatedData['name_event'];
+        $event->location = $validatedData['location'];
+        $event->date = $validatedData['date'];
+        $event->description_event = $validatedData['description_event'];
+        $event->event_image = $filePath;
+        $event->account_id = $account->id;
+        $event->save();
+
+        return redirect('/event')->with('status', 'Event berhasil dibuat!');
     }
-
-    $event = new Event;
-    $event->name_event = $validatedData['name_event'];
-    $event->location = $validatedData['location'];
-    $event->date = $validatedData['date'];
-    $event->description_event = $validatedData['description_event'];
-    $event->event_image = $filePath;
-    $event->account_id = $account->id;
-    $event->save();
-
-    return redirect('/event')->with('status', 'Event berhasil dibuat!');
-}
 
 
 
