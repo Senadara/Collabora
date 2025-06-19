@@ -9,68 +9,76 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
+use Illuminate\Support\Str;
+
 
 class EventRegistController extends Controller
 {
-
-    public function addeventregist(Request $request, $eventId)
+    public function addeventregist(Request $request, $event)
     {
-        $user = session('account');
+        $userId = auth()->id();
 
-        $event = Event::findOrFail($eventId);
-
-        // Cegah daftar ke event sendiri
-        if ($event->account_id == $user->id) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Tidak bisa mendaftar ke event milik sendiri.'
-            ], 403);
+        if (EventRegistModel::where('account_id', $userId)
+            ->where('event_id', $event)
+            ->exists()
+        ) {
+            return back()
+                ->withInput()
+                ->with('swal_error', 'Anda sudah mendaftar sebagai volunteer pada event ini.')
+                ->with('event_id', $event);
         }
 
-        // Cegah daftar ulang
-        if (EventRegistModel::where('account_id', $user->id)->where('event_id', $eventId)->exists()) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Anda sudah mendaftar sebagai volunteer.'
-            ], 409);
-        }
-
-        // Validasi
         $validator = Validator::make($request->all(), [
-            'phone' => 'required|regex:/^(\+62|62|0)[0-9]{9,13}$/',
-            'experience' => 'required|string',
-            'cv' => 'required|file|mimes:pdf,doc,docx|max:2048',
+            'phone' => ['required', 'regex:/^(\+62|62|0)8[1-9][0-9]{6,10}$/'],
+            'experience' => ['required', 'string'],
+            'cv' => ['required', 'file', 'mimes:pdf,doc,docx', 'max:2048'],
+        ], [
+            'phone.required' => 'Nomor telepon wajib diisi.',
+            'phone.regex' => 'Format nomor telepon tidak valid.',
+            'experience.required' => 'Pengalaman wajib diisi.',
+            'cv.required' => 'CV wajib diunggah.',
+            'cv.mimes' => 'CV harus berupa file PDF, DOC, atau DOCX.',
+            'cv.max' => 'Ukuran file maksimal 2MB.',
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'status' => 'error',
-                'errors' => $validator->errors()
-            ], 422);
+            return back()
+                ->withErrors($validator)
+                ->withInput()
+                ->with('swal_error', 'Terdapat kesalahan pada input. Mohon periksa kembali.')
+                ->with('event_id', $event);
         }
 
-        // Upload file
-        $cvPath = null;
+        $filePath = null;
+        // Simpan file CV
         if ($request->hasFile('cv')) {
-            $filename = time() . '_' . $request->file('cv')->getClientOriginalName();
-            $cvPath = 'uploads/cv/' . $filename;
-            $request->file('cv')->move(public_path('uploads/cv'), $filename);
+            $folder = 'cv';
+            $file = $request->file('cv');
+            $filename = time() . '_' . $file->getClientOriginalName();
+
+            $storagePath = config("imagepath.folders.$folder.storage_path");
+            //$urlPath = config("imagepath.folders.$folder.url_path");
+
+            if (!file_exists($storagePath)) {
+                mkdir($storagePath, 0777, true);
+            }
+
+            $file->move($storagePath, $filename);
+            $filePath = config("imagepath.folders.$folder.db_path") . '/' . $filename;
         }
 
-        // Simpan pendaftaran
+        // Simpan ke DB
         EventRegistModel::create([
-            'event_id' => $eventId,
-            'account_id' => $user->id,
+            'account_id' => auth()->id(),
             'phone' => $request->phone,
+            'status' => 'request',
+            'reward' => 'false',
             'experience' => $request->experience,
-            'cv' => $cvPath,
+            'event_id' => $event,
+            'cv_path' => $filePath,
         ]);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Pendaftaran volunteer berhasil.'
-        ]);
+        return back()->with('swal_success', 'Pendaftaran berhasil dikirim.');
     }
 
 

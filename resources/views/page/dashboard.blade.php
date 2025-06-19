@@ -24,12 +24,18 @@
                 <h1><b> Our Event</b></h1>
             </div>
 
-            <form action="{{ route('event.search') }}" method="GET" class="d-flex col-4" target="_self">
+            <form action="{{ route('event.search') }}" method="GET" class="d-flex col-4">
                 <input class="form-control me-2" type="text" name="search" placeholder="Search Event">
                 <button class="btn bg-dark text-white" type="submit">Search</button>
             </form>
 
             <br>
+
+            {{-- Trigger to reopen modal on validation error --}}
+            @if ($errors->any())
+                <input type="hidden" id="openModalId" value="{{ old('event_id') }}">
+            @endif
+
             <div class="card-wrapper">
                 @foreach ($events as $event)
                     <div class="col">
@@ -53,34 +59,43 @@
                             <form name="formEventRegist" action="{{ route('regist.event', ['event' => $event->id]) }}"
                                 method="post" enctype="multipart/form-data">
                                 @csrf
+                                <input type="hidden" name="event_id" value="{{ $event->id }}">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title">Registation Form</h5>
+                                        <h5 class="modal-title">Registration Form</h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal"
                                             aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
                                         <div class="mb-3">
                                             <label for="phone" class="form-label">Nomor Telepon</label>
-                                            <input type="text" class="form-control" name="phone"
+                                            <input type="text" class="form-control @error('phone') is-invalid @enderror"
+                                                name="phone" value="{{ old('phone') }}"
                                                 placeholder="Masukkan nomor telepon">
-                                            <div class="invalid-feedback"></div> <!-- untuk error -->
+                                            @error('phone')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
                                         </div>
 
                                         <div class="mb-3">
                                             <label for="experience" class="form-label">Pengalaman</label>
-                                            <input type="text" class="form-control" name="experience"
+                                            <input type="text"
+                                                class="form-control @error('experience') is-invalid @enderror"
+                                                name="experience" value="{{ old('experience') }}"
                                                 placeholder="Masukkan pengalaman">
-                                            <div class="invalid-feedback"></div>
+                                            @error('experience')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
                                         </div>
 
                                         <div class="mb-3">
                                             <label for="cv" class="form-label">Upload CV</label>
-                                            <input type="file" class="form-control" name="cv"
-                                                accept=".pdf,.doc,.docx">
-                                            <div class="invalid-feedback"></div>
+                                            <input type="file" class="form-control @error('cv') is-invalid @enderror"
+                                                name="cv" accept=".pdf,.doc,.docx">
+                                            @error('cv')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
                                         </div>
-
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary"
@@ -96,84 +111,43 @@
         </div>
     </div>
 @endsection
+
+
 @push('scripts')
+    {{-- SweetAlert2 --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    {{-- Reopen modal jika error validasi --}}
     <script>
-        document.querySelectorAll('form[name="formEventRegist"]').forEach(form => {
-            form.addEventListener('submit', function(event) {
-                event.preventDefault();
+        document.addEventListener('DOMContentLoaded', function() {
+            const modalId = document.getElementById('openModalId')?.value;
+            if (modalId) {
+                const selector = '#modalEventRegist' + modalId;
+                new bootstrap.Modal(document.querySelector(selector)).show();
+            }
+        });
+    </script>
 
-                // Bersihkan error sebelumnya
-                form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-                form.querySelectorAll('.invalid-feedback').forEach(el => el.innerText = '');
+    {{-- Tampilkan SweetAlert berdasarkan session --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            @if (session('swal_success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: {!! json_encode(session('swal_success')) !!},
+                    confirmButtonColor: '#3085d6'
+                });
+            @endif
 
-                const formData = new FormData(form);
-
-                fetch(form.action, {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': form.querySelector('input[name="_token"]').value
-                        },
-                        body: formData
-                    })
-                    .then(async response => {
-                        let data;
-                        try {
-                            data = await response.json();
-                        } catch (error) {
-                            throw new Error('Response bukan JSON valid');
-                        }
-
-                        if (response.ok && data.status === 'success') {
-                            Swal.fire({
-                                title: 'Berhasil!',
-                                text: data.message ||
-                                    'Anda berhasil mendaftar sebagai volunteer.',
-                                icon: 'success',
-                                confirmButtonText: 'OK'
-                            }).then(() => {
-                                window.location.href = "/dashboard";
-                            });
-                        } else if (data.status === 'error' && data.errors) {
-                            for (const [field, messages] of Object.entries(data.errors)) {
-                                const input = form.querySelector(`[name="${field}"]`);
-                                const feedback = input?.closest('.mb-3')?.querySelector(
-                                    '.invalid-feedback');
-
-                                if (input) {
-                                    input.classList.add('is-invalid');
-                                }
-
-                                if (feedback) {
-                                    feedback.innerText = messages[
-                                    0]; // Tampilkan pesan error pertama
-                                }
-                            }
-
-                            Swal.fire({
-                                title: 'Validasi Gagal!',
-                                text: 'Silakan periksa kembali input Anda.',
-                                icon: 'error',
-                                confirmButtonText: 'OK'
-                            });
-                        } else {
-                            Swal.fire({
-                                title: 'Gagal!',
-                                text: data.message || 'Terjadi kesalahan saat mendaftar.',
-                                icon: 'error',
-                                confirmButtonText: 'OK'
-                            });
-                        }
-                    })
-                    .catch(error => {
-                        Swal.fire({
-                            title: 'Error!',
-                            text: error.message || 'Terjadi kesalahan jaringan.',
-                            icon: 'error',
-                            confirmButtonText: 'OK'
-                        });
-                    });
-            });
+            @if (session('swal_error'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: {!! json_encode(session('swal_error')) !!},
+                    confirmButtonColor: '#d33'
+                });
+            @endif
         });
     </script>
 @endpush
