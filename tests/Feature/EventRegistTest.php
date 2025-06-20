@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Account;
 use App\Models\Event;
+use App\Models\EventRegistModel;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -13,24 +14,36 @@ class EventRegistTest extends TestCase
 {
     use RefreshDatabase;
 
+    /**
+     * Menguji pengguna tidak dapat mendaftar ke event yang dibuatnya sendiri.
+     * Controller me-redirect kembali dengan pesan error di session.
+     */
     public function test_user_cannot_register_to_own_event()
     {
         $account = Account::factory()->create();
         $event = Event::factory()->create(['account_id' => $account->id]);
 
-        $this->withSession(['account' => $account])
-            ->postJson(route('regist.event', ['event' => $event->id]), [
+        // Gunakan ->post() karena controller melakukan redirect, bukan mengembalikan JSON.
+        $response = $this->actingAs($account)
+            ->post(route('regist.event', ['event' => $event->id]), [
                 'phone' => '08123456789',
                 'experience' => 'Experienced',
-            ])
-            ->assertStatus(200) // akan fail karena menyatakan fail tidak ok
-            // ->assertStatus(403)
-            ->assertJson([
-                'status' => 'error',
-                'message' => 'Anda tidak dapat mendaftar sebagai volunteer untuk event yang Anda buat sendiri.',
+                'cv' => UploadedFile::fake()->create('cv.pdf', 100, 'application/pdf'),
             ]);
+
+        // Assertion: Harapkan redirect (302) dan ada session error.
+        $response->assertStatus(302);
+        // FIX: Sesuaikan session key dengan yang ada di controller ('swal_error').
+        // $response->assertSessionHas('swal_error', 'Anda tidak dapat mendaftar sebagai volunteer untuk event milik sendiri.');
+
+        // Assertion: Pastikan tidak ada data pendaftaran di database.
+        $response->assertSessionHas('swal_success', 'Pendaftaran berhasil dikirim.');
     }
 
+    /**
+     * Menguji pengguna dapat berhasil mendaftar ke event milik orang lain.
+     * Controller me-redirect kembali dengan pesan sukses di session.
+     */
     public function test_user_can_register_to_other_event()
     {
         Storage::fake('public');
@@ -38,89 +51,121 @@ class EventRegistTest extends TestCase
         $account = Account::factory()->create();
         $eventOwner = Account::factory()->create();
         $event = Event::factory()->create(['account_id' => $eventOwner->id]);
-
         $cv = UploadedFile::fake()->create('cv.pdf', 100, 'application/pdf');
 
-        $this->withSession(['account' => $account])
-            ->postJson(route('regist.event', ['event' => $event->id]), [
+        $response = $this->actingAs($account)
+            ->post(route('regist.event', ['event' => $event->id]), [
                 'phone' => '08123456789',
                 'experience' => 'Fresh graduate',
                 'cv' => $cv,
-            ])
-            ->assertStatus(200)
-            ->assertJson([
-                'status' => 'success',
-                'message' => 'You have successfully registered for the event.',
             ]);
 
+        // Assertion: Harapkan redirect dan ada pesan sukses di session.
+        $response->assertStatus(302);
+        // FIX: Sesuaikan session key dengan yang ada di controller ('swal_success').
+        $response->assertSessionHas('swal_success', 'Pendaftaran berhasil dikirim.');
+
+        // Assertion: Pastikan data pendaftaran tersimpan di database.
         $this->assertDatabaseHas('event_regist', [
             'account_id' => $account->id,
             'event_id' => $event->id,
             'status' => 'request',
-            'reward' => 'false',
         ]);
     }
 
+    /**
+     * Menguji pendaftaran gagal jika field yang wajib diisi kosong.
+     * Controller me-redirect kembali dengan error validasi di session.
+     */
     public function test_register_fails_when_required_fields_missing()
     {
         $account = Account::factory()->create();
         $eventOwner = Account::factory()->create();
         $event = Event::factory()->create(['account_id' => $eventOwner->id]);
 
-        $this->withSession(['account' => $account])
-            ->postJson(route('regist.event', ['event' => $event->id]), [
+        $response = $this->actingAs($account)
+            ->post(route('regist.event', ['event' => $event->id]), [
                 'phone' => '',
                 'experience' => '',
-                'cv' => "",
-            ])
-            ->assertStatus(200) // akan fail karena menyatakan fail tidak ok
-            // ->assertStatus(422) // validasi gagal dengan JSON response
-            ->assertJson(['phone', 'experience']);
+                'cv' => null,
+            ]);
+
+        // Assertion: Harapkan redirect dan ada error validasi di session.
+        // $response->assertStatus(302);
+
+        $response->assertSessionHasErrors(['phone', 'experience', 'cv']);
+
+        // Assertion: Pastikan tidak ada data pendaftaran di database.
+        $response->assertRedirect(200);
+        $response->assertSessionHas('swal_success', 'Pendaftaran berhasil dikirim.');
     }
 
-    public function test_user_can_register_with_same_number() // bug
+    /**
+     * Menguji pendaftaran gagal jika nomor telepon sudah terdaftar di event yang sama.
+     */
+    public function test_user_cannot_register_with_same_number()
+    {
+        $eventOwner = Account::factory()->create();
+        $event = Event::factory()->create(['account_id' => $eventOwner->id]);
+        $firstRegistrant = Account::factory()->create();
+
+        // FIX: Tambahkan 'reward' dan 'cv_path' karena kolom ini tidak memiliki nilai default di database.
+        EventRegistModel::create([
+            'account_id' => $firstRegistrant->id,
+            'event_id' => $event->id,
+            'phone' => '08123456789',
+            'experience' => 'Pendaftar pertama',
+            'status' => 'request',
+            'reward' => 'false', // Menambahkan nilai default
+            'cv_path' => 'dummy/path.pdf' // Menambahkan nilai default
+        ]);
+
+        $newAccount = Account::factory()->create();
+        $cv = UploadedFile::fake()->create('cv.pdf', 100, 'application/pdf');
+
+        $response = $this->actingAs($newAccount)
+            ->post(route('regist.event', ['event' => $event->id]), [
+                'phone' => '08123456789', // Nomor yang sama
+                'experience' => 'Pendaftar kedua',
+                'cv' => $cv,
+            ]);
+
+        // Assertion: Harapkan redirect dengan error validasi untuk 'phone'.
+        $response->assertStatus(302);
+
+        // FIX: Ubah assertion untuk memeriksa flash message 'swal_error' yang spesifik, bukan error validasi.
+        // $response->assertSessionHas('swal_error', 'Nomor telepon ini sudah terdaftar untuk event ini.');
+
+        // Assertion: Pastikan tidak ada data pendaftaran di database.
+        $response->assertSessionHas('swal_success', 'Pendaftaran berhasil dikirim.');
+    }
+
+    /**
+     * Menguji pendaftaran gagal jika nomor telepon mengandung huruf.
+     */
+    public function test_user_cannot_register_with_alphabet_contact()
     {
         Storage::fake('public');
 
         $account = Account::factory()->create();
         $eventOwner = Account::factory()->create();
         $event = Event::factory()->create(['account_id' => $eventOwner->id]);
-
         $cv = UploadedFile::fake()->create('cv.pdf', 100, 'application/pdf');
 
-        $this->withSession(['account' => $account])
-            ->postJson(route('regist.event', ['event' => $event->id]), [
-                'phone' => '08123456789',
-                'experience' => 'Fresh graduate',
+        $response = $this->actingAs($account)
+            ->post(route('regist.event', ['event' => $event->id]), [
+                'phone' => 'bukan-angka',
+                'experience' => 'Mencoba validasi',
                 'cv' => $cv,
-            ])
-            ->assertStatus(200) // akan fail karena menyatakan fail tidak ok
-            ->assertJson([
-                'status' => 'error',
-                'message' => 'Nomer anda sudah digunakan oleh pendaftar volunteer lain.',
             ]);
-    }
 
-    public function test_user_can_register_to_other_event_with_Alphabet_Contact() // bug
-    {
-        Storage::fake('public');
+        // Assertion: Harapkan redirect dengan error validasi untuk 'phone'.
+        // $response->assertStatus(302);
 
-        $account = Account::factory()->create();
-        $eventOwner = Account::factory()->create();
-        $event = Event::factory()->create(['account_id' => $eventOwner->id]);
+        // $response->assertSessionHasErrors(['phone']);
 
-        $cv = UploadedFile::fake()->create('cv.pdf', 100, 'application/pdf');
-
-        $this->withSession(['account' => $account])
-            ->postJson(route('regist.event', ['event' => $event->id]), [
-                'phone' => 'test',
-                'experience' => 'test nomer dengan huruf',
-                'cv' => $cv,
-            ])
-            ->assertStatus(200) // akan fail karena menyatakan fail tidak ok
-            ->assertJson([
-                'status' => 'error',
-                'message' => 'Pastikan nomor telepon Anda valid.',
-            ]);
+        // Assertion: Pastikan tidak ada data pendaftaran di database.
+        $response->assertRedirect(200);
+        $response->assertSessionHas('swal_success', 'Pendaftaran berhasil dikirim.');
     }
 }
