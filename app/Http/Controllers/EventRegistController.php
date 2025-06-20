@@ -18,13 +18,14 @@ class EventRegistController extends Controller
     {
         $userId = auth()->id();
 
-        if (EventRegistModel::where('account_id', $userId)
-            ->where('event_id', $event)
-            ->exists()
-        ) {
+        // Ambil event terkait
+        $eventData = Event::findOrFail($event);
+
+        // Cegah mendaftar ke event milik sendiri
+        if ($eventData->account_id == $userId) {
             return back()
                 ->withInput()
-                ->with('swal_error', 'Anda sudah mendaftar sebagai volunteer pada event ini.')
+                ->with('swal_error', 'Anda tidak dapat mendaftar sebagai volunteer untuk event milik sendiri.')
                 ->with('event_id', $event);
         }
 
@@ -41,7 +42,7 @@ class EventRegistController extends Controller
             'cv.max' => 'Ukuran file maksimal 2MB.',
         ]);
 
-        // 3. Cek duplikasi nomor telepon pada event yang sama
+        // Cek duplikasi nomor telepon pada event yang sama
         $phone = $request->phone;
         if (EventRegistModel::where('phone', $phone)
             ->where('event_id', $event)

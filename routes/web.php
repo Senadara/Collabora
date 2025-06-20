@@ -67,6 +67,7 @@ Route::middleware(['auth', 'role:user|event_creator|admin'])->group(function () 
     });
     Route::get('/logout', [SessionController::class, 'logout']);
     //Event-Creator
+    Route::post('/event_regist/addeventregist/{event}', [EventRegistController::class, 'addeventregist'])->name('regist.event');
     Route::get('/event/show/{id}', [EventController::class, 'show']);
     Route::get('/search', [EventController::class, 'search'])->name('event.search');
 
@@ -103,7 +104,6 @@ Route::middleware(['auth', 'role:admin|event_creator'])->group(function () {
     Route::get('/event/edit/{id}', [EventController::class, 'edit']);
     Route::put('/event/update/{id}', [EventController::class, 'update']);
     Route::get('/event/{id}', [EventController::class, 'destroy']);
-    Route::post('/event_regist/addeventregist/{event}', [EventRegistController::class, 'addeventregist'])->name('regist.event');
     Route::get('/volunteer', [EventRegistController::class, 'index']);
     Route::get('/volunteer/show/{event}', [EventRegistController::class, 'show'])->name('show.volunteer');
     Route::get('/volunteer/showAccepted/{event}', [EventRegistController::class, 'showAccepted'])->name('show.accepted.volunteer');
