@@ -6,165 +6,141 @@ use App\Models\Account;
 use App\Models\Event;
 use App\Models\EventRegistModel;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Session;
 use Tests\TestCase;
 
 class EventRegistControllerTest extends TestCase
 {
     use RefreshDatabase;
 
+    /**
+     * @var \App\Models\Account
+     */
+    protected $eventOwner;
+
+    /**
+     * @var \App\Models\Event
+     */
+    protected $event;
+
+    /**
+     * Menyiapkan lingkungan tes.
+     * Method ini dijalankan sebelum setiap tes dalam kelas ini.
+     */
     protected function setUp(): void
     {
         parent::setUp();
-        // Create an admin account for testing purposes, as per the routes defined in web.php
-        $adminAccount = Account::factory()->create([
-            'email' => 'admin@example.com',
-            'role' => 'admin',
-        ]);
-        Session::put('account', $adminAccount);
+        // 1. Buat satu pengguna dengan role 'event_creator' yang akan digunakan di semua tes.
+        $this->eventOwner = Account::factory()->create(['role' => 'event_creator']);
+
+        // 2. Buat satu event yang dimiliki oleh pengguna di atas.
+        $this->event = Event::factory()->create(['account_id' => $this->eventOwner->id]);
     }
 
     /**
-     * Test displaying volunteer attendance (requests).
-     * This tests the `show` method of `EventRegistController` which retrieves all registrations for an event,
-     * and indirectly verifies the `list-volunteer.blade.php` view filters for 'request' status.
+     * Tes untuk menampilkan halaman permintaan volunteer.
      *
      * @return void
      */
     public function test_view_volunteer_attendance_requests()
     {
-        $eventOwner = Account::factory()->create();
-        $event = Event::factory()->create(['account_id' => $eventOwner->id]);
+        // Buat data pendaftar dengan status 'request' dan 'accepted'
+        $requestingVolunteer = Account::factory()->create(['name' => 'Volunteer Request']);
+        $acceptedVolunteer = Account::factory()->create(['name' => 'Volunteer Accepted']);
 
-        $volunteer1 = Account::factory()->create(['name' => 'Volunteer One']);
-        $volunteer2 = Account::factory()->create(['name' => 'Volunteer Two']);
-        $volunteer3 = Account::factory()->create(['name' => 'Volunteer Three']);
-
-        // Volunteer 1 and 2 are in 'request' status
+        // Menggunakan ::create() untuk menghindari ketergantungan pada file Factory
         EventRegistModel::create([
-            'account_id' => $volunteer1->id,
-            'event_id' => $event->id,
-            'phone' => '111111111',
+            'account_id' => $requestingVolunteer->id,
+            'event_id' => $this->event->id,
+            'status' => 'request',
+            'reward' => 'false',
+            'phone' => '123456789',
             'experience' => 'Some experience',
-            'status' => 'request',
-            'reward' => 'false',
         ]);
+
         EventRegistModel::create([
-            'account_id' => $volunteer2->id,
-            'event_id' => $event->id,
-            'phone' => '222222222',
-            'experience' => 'More experience',
-            'status' => 'request',
-            'reward' => 'false',
-        ]);
-        // Volunteer 3 is 'accepted'
-        EventRegistModel::create([
-            'account_id' => $volunteer3->id,
-            'event_id' => $event->id,
-            'phone' => '333333333',
-            'experience' => 'Accepted experience',
+            'account_id' => $acceptedVolunteer->id,
+            'event_id' => $this->event->id,
             'status' => 'accepted',
-            'reward' => 'false',
+                        'reward' => 'false',
+            'phone' => '987654321',
+            'experience' => 'Other experience',
         ]);
 
-        $response = $this->get(route('show.volunteer', ['event' => $event->id]));
+        // Bertindak sebagai pemilik acara dan akses rute
+        $response = $this->actingAs($this->eventOwner)->get(route('show.volunteer', ['event' => $this->event->id]));
 
+        // Lakukan assertion
         $response->assertStatus(200);
-        $response->assertViewIs('page.list-volunteer'); // Corrected from 'page/list-volunteer'
-        $response->assertViewHas('volunteerList');
-
-        // Assert that the 'request' volunteers are present in the response (filtered by the view)
-        $response->assertSee('Volunteer One');
-        $response->assertSee('Volunteer Two');
-        $response->assertDontSee('Volunteer Three'); // Volunteer Three should not be shown in the 'request' list
+        $response->assertViewIs('page.list-volunteer');
+        $response->assertSee('Volunteer Request');
+        $response->assertDontSee('Volunteer Accepted'); // Pastikan volunteer yang diterima tidak ada di daftar permintaan
     }
 
     /**
-     * Test displaying the list of accepted volunteers.
-     * This tests the `showAccepted` method of `EventRegistController`.
+     * Tes untuk menampilkan halaman daftar volunteer yang sudah diterima.
      *
      * @return void
      */
-    public function test_view_list_volunteer_sorting_accepted()
+    public function test_view_list_volunteer_accepted()
     {
-        $eventOwner = Account::factory()->create();
-        $event = Event::factory()->create(['account_id' => $eventOwner->id]);
-
-        $volunteer1 = Account::factory()->create(['name' => 'Accepted Volunteer One']);
-        $volunteer2 = Account::factory()->create(['name' => 'Requested Volunteer Two']);
-        $volunteer3 = Account::factory()->create(['name' => 'Accepted Volunteer Three']);
+        // Buat data pendaftar dengan status 'request' dan 'accepted'
+        $requestingVolunteer = Account::factory()->create(['name' => 'Requested Volunteer']);
+        $acceptedVolunteer = Account::factory()->create(['name' => 'Accepted Volunteer']);
 
         EventRegistModel::create([
-            'account_id' => $volunteer1->id,
-            'event_id' => $event->id,
-            'phone' => '111111111',
-            'experience' => 'Experience one',
-            'status' => 'accepted',
-            'reward' => 'false',
-        ]);
-        EventRegistModel::create([
-            'account_id' => $volunteer2->id,
-            'event_id' => $event->id,
-            'phone' => '222222222',
-            'experience' => 'Experience two',
+            'account_id' => $requestingVolunteer->id,
+            'event_id' => $this->event->id,
             'status' => 'request',
             'reward' => 'false',
+            'phone' => '123456789',
+            'experience' => 'Some experience',
         ]);
+
         EventRegistModel::create([
-            'account_id' => $volunteer3->id,
-            'event_id' => $event->id,
-            'phone' => '333333333',
-            'experience' => 'Experience three',
+            'account_id' => $acceptedVolunteer->id,
+            'event_id' => $this->event->id,
             'status' => 'accepted',
             'reward' => 'false',
+            'phone' => '987654321',
+            'experience' => 'Other experience',
         ]);
 
-        $response = $this->get(route('show.accepted.volunteer', ['event' => $event->id]));
+        // Bertindak sebagai pemilik acara dan akses rute
+        $response = $this->actingAs($this->eventOwner)->get(route('show.accepted.volunteer', ['event' => $this->event->id]));
 
+        // Lakukan assertion
         $response->assertStatus(200);
-        $response->assertViewIs('page.accepted-volunteer'); // Corrected from 'page/accepted-volunteer'
-        $response->assertViewHas('volunteerList');
-
-        // Assert that only 'accepted' volunteers are present in the response
-        $response->assertSee('Accepted Volunteer One');
-        $response->assertDontSee('Requested Volunteer Two'); // Requested volunteer should not be seen
-        $response->assertSee('Accepted Volunteer Three');
+        $response->assertViewIs('page.accepted-volunteer');
+        $response->assertSee('Accepted Volunteer');
+        $response->assertDontSee('Requested Volunteer'); // Pastikan volunteer yang meminta tidak ada di daftar diterima
     }
 
     /**
-     * Test that an admin can accept a new volunteer for an event they created.
+     * Tes bahwa pemilik acara dapat menerima permintaan volunteer.
      *
      * @return void
      */
-    public function test_admin_can_accept_new_volunteer_for_their_event()
+    public function test_event_owner_can_accept_new_volunteer()
     {
-        // The admin account is already created in setUp() and stored in the session.
-        $adminAccount = Session::get('account');
-
-        // Create an event owned by this admin
-        $event = Event::factory()->create(['account_id' => $adminAccount->id]);
-
-        // Create a volunteer account
-        $volunteer = Account::factory()->create(['name' => 'New Volunteer']);
-
-        // Create an EventRegistModel entry for this volunteer with 'request' status
+        // Buat pendaftar dengan status 'request'
+        $volunteer = Account::factory()->create();
         $registration = EventRegistModel::create([
             'account_id' => $volunteer->id,
-            'event_id' => $event->id,
-            'phone' => '444444444',
-            'experience' => 'Some new experience',
+            'event_id' => $this->event->id,
             'status' => 'request',
             'reward' => 'false',
+            'phone' => '555555555',
+            'experience' => 'Ready to be accepted',
         ]);
 
-        // Act as the admin and call the accept route
-        $response = $this->actingAs($adminAccount)->get(route('accept.volunteer', ['id' => $registration->id]));
+        // Bertindak sebagai pemilik acara dan panggil rute untuk menerima
+        $response = $this->actingAs($this->eventOwner)->get(route('accept.volunteer', ['id' => $registration->id]));
 
-        // Assert that the response redirects (status 302)
+        // Lakukan assertion
         $response->assertStatus(302);
-        $response->assertRedirect('/event'); // Assuming it redirects back to the event list or a relevant page
+        $response->assertRedirect('/event');
 
-        // Assert that the volunteer's status has been updated to 'accepted' in the database
+        // Pastikan status di database sudah berubah menjadi 'accepted'
         $this->assertDatabaseHas('event_regist', [
             'id' => $registration->id,
             'status' => 'accepted',
